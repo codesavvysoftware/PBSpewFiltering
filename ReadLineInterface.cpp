@@ -42,7 +42,14 @@ namespace ProcessPBSpews
 
 		while (bLineFeedNotRead)
 		{
-			result = fread(pWideBuf, 1, lSize, f);
+			try
+			{
+				result = fread(pWideBuf, 1, lSize, f);
+			}
+			catch (int e)
+			{
+				return false;
+			}
 
 			uiNumRead += lSize;
 
@@ -146,7 +153,16 @@ namespace ProcessPBSpews
 		return !bLineFeedNotRead;
 	}
 
-	void ProduceFilteredSpewData::StripLeadingBlanks(char * pcLineBuffer, char ** pcNewBuffer)
+
+	GenerateFilteredSpewData::GenerateFilteredSpewData()
+	{
+	}
+
+
+	GenerateFilteredSpewData::~GenerateFilteredSpewData()
+	{
+	}
+	void GenerateFilteredSpewData::StripLeadingBlanks(char * pcLineBuffer, char ** pcNewBuffer)
 	{
 		int i;
 
@@ -161,15 +177,20 @@ namespace ProcessPBSpews
 		*pcNewBuffer = &pcLineBuffer[i];
 	}
 
-	bool ProduceFilteredSpewData::FindFieldStr(const char * pcFields[], char * pcStartOfField)
+	bool GenerateFilteredSpewData::FindFieldStr(const char * pcFields[], char * pcStartOfField)
 	{
+		if (pcFields[0] == nullptr)
+		{
+			return true;
+		}
+
 		int i = 0;
 
 		const char * pcFieldStr;
 
 		bool bFieldFound = false;
 
-		while (pcFields[i] != NULL)
+		while (pcFields[i] != nullptr)
 		{
 			pcFieldStr = pcFields[i];
 
@@ -209,13 +230,11 @@ namespace ProcessPBSpews
 
 		return bFieldFound;
 	}
-	bool ProduceFilteredSpewData::operator()
-		(const char * pcFolder, const char * pcInputFile, const char * pcOutputFile, const char * pcFilter[], string & sErrorMsgRet)
+	bool GenerateFilteredSpewData::operator()
+		(const char * pcFolder, const char * pcInputFile, unsigned int uiMaxFileNameSize, vector<sFilterDescriptor> & lFilterDescriptors, string & sErrorMsgRet)
 	{
-		char cPath[1000];
-
 		ostringstream osErrorMsgRet;
-		
+
 		osErrorMsgRet << "";
 
 		const char cTempFilteredFileName[] = "Temp.txt";
@@ -231,7 +250,18 @@ namespace ProcessPBSpews
 			return false;
 		}
 
-		FILE * fSrc = fopen(pcInputFile, "r");
+		int iCurrentDescriptor = 0;
+		
+		string sInputFileName(pcInputFile);
+
+		int iFileExtPos = sInputFileName.find('.');
+
+		if (iFileExtPos < 0)
+		{
+			sInputFileName += ".txt";
+		}
+			
+		FILE * fSrc = fopen(sInputFileName.c_str(), "r");
 
 		if (!fSrc)
 		{
@@ -256,7 +286,7 @@ namespace ProcessPBSpews
 		}
 
 		bool bProducedAFilteredSpew = false;
-		
+
 		char cLineBuffer[100000];
 
 		unsigned int uiBufferSizeMax = 100000;
@@ -276,7 +306,23 @@ namespace ProcessPBSpews
 		while (!bEndOfFile)
 		{
 
-			if (!rulReadUnicode(fSrc, pcLineBuffer, uiBufferSizeMax, uiNumberOfCharsRead, bEndOfFile))
+			bool bLineReadSuccess = false;
+			
+			try
+			{
+				bLineReadSuccess = rulReadUnicode(fSrc, pcLineBuffer, uiBufferSizeMax, uiNumberOfCharsRead, bEndOfFile);
+			}
+			catch (int e)
+			{
+				osErrorMsgRet << "Error with source file probably not saved as in Unicode format.  Hopefully will be fixed shortly so all input format work" << GetLastError() << endl;
+
+				sErrorMsgRet = osErrorMsgRet.str();
+
+				return false;
+			}
+
+			
+			if (bLineReadSuccess)
 			{
 				if (bEndOfFile)
 				{
@@ -298,7 +344,7 @@ namespace ProcessPBSpews
 
 
 			StripLeadingBlanks(pcLineBuffer, &pcLineBuffer);
-			
+
 			int i = 0;
 
 			for (i = 0; pcLineBuffer[i] != '\n'; i++)
@@ -311,11 +357,13 @@ namespace ProcessPBSpews
 
 			if (pcLineBuffer[0] != '\n')
 			{
+				FileLines.emplace_back(pcLineBuffer);
+
 				fwrite(pcLineBuffer, sizeof(char), strlen(pcLineBuffer), fDest);
-			
+
 				fflush(fDest);
 
-				
+
 			}
 		}
 
@@ -333,111 +381,127 @@ namespace ProcessPBSpews
 
 		remove(cTempRenameFileName);
 
-		if (!rename(cTempFilteredFileName, cTempRenameFileName))
+		string sOutput(pcInputFile);
+
+		iFileExtPos = sOutput.find('.');
+
+		if (iFileExtPos < 0)
 		{
-			FILE * fSrc = fopen(cTempRenameFileName, "r");
+			sOutput += "_New_Unfiltered.txt";
+		}
+		else
+		{
+			int iNumberToErase = sOutput.length();
 
-			if (!fSrc)
+			iNumberToErase -= iFileExtPos;
+
+			sOutput.erase(iFileExtPos, iNumberToErase);
+			//erase(iFileExtPos, sOutput.end());
+
+			sOutput += "_New_Unfiltered.txt";
+		}
+
+		//vector<string> sToFilterOn = { "Garbage", "Data" };
+		bool bOutputRenamed = false;
+
+		if (fDest = fopen(sOutput.c_str(), "r"))
+		{
+			fclose(fDest);
+
+			if (!rename(sOutput.c_str(), cTempRenameFileName))
 			{
-				osErrorMsgRet << "Error Opening stripped leading blanks file" << GetLastError() << endl;
-
-				sErrorMsgRet = osErrorMsgRet.str();
-
-				return false;
+					bOutputRenamed = true;
 			}
 
-			FILE * fDest = fopen(cTempFilteredFileName, "w+");
+		}
+
+		rename(cTempFilteredFileName, sOutput.c_str());
+
+		if (bOutputRenamed)
+		{
+			remove(cTempRenameFileName);
+		}
+
+
+		for (vector<sFilterDescriptor>::iterator itInputList = lFilterDescriptors.begin(); itInputList != lFilterDescriptors.end(); itInputList++)
+		{
+			fDest = fopen(cTempFilteredFileName, "w+");
 
 			if (!fDest)
 			{
-				fclose(fSrc);
-
-				osErrorMsgRet << "Error opening filtered  file" << GetLastError() << endl;
+				osErrorMsgRet << "Error opening destination file" << GetLastError() << endl;
 
 				sErrorMsgRet = osErrorMsgRet.str();
 
-				return false;
+				continue;
 			}
 
-
-			bEndOfFile = false;
-
-			pcLineBuffer = cLineBuffer;
-
-			char * pc = pcLineBuffer;
-
-			while (!bEndOfFile)
+			for (vector<string>::iterator iter = FileLines.begin(); iter != FileLines.end(); iter++)
 			{
+				vector<string>::iterator iterFilters = itInputList->sToFilterOn.begin();
 
-				if (!rulReadASCII(fSrc, pcLineBuffer, uiBufferSizeMax, uiNumberOfCharsRead, bEndOfFile))
+				vector<string>::iterator iterFiltersEnd = itInputList->sToFilterOn.end();
+
+				while (iterFilters != iterFiltersEnd)
+				//while (0 != itInputList->sToFilterOn[i].length())
 				{
-					if (bEndOfFile)
-					{
-						break;
-					}
-					else if (uiNumberOfCharsRead == uiBufferSizeMax)
-					{
-						osErrorMsgRet << "Read Buffer Not Big Enough" << endl;
+					size_t found = iter->find(iterFilters->c_str());//   itInputList->sToFilterOn[i]);
 
-						break;
-					}
-					else
+					if (found != string::npos)
 					{
-						osErrorMsgRet << "Error Reading File" << endl;
+						fwrite(iter->c_str(), sizeof(char), strlen(iter->c_str()), fDest);
+
+						fflush(fDest);
 
 						break;
 					}
-				}
-
-				if (FindFieldStr(pcFilter, pc))
-				{
-					fwrite(cLineBuffer, sizeof(char), strlen(cLineBuffer), fDest);
-
-					fflush(fDest);
+					iterFilters++;
 				}
 			}
 
-
-			fclose(fSrc);
 			fclose(fDest);
 
-			if (!bEndOfFile)
-			{
-				sErrorMsgRet = osErrorMsgRet.str();
+			bOutputRenamed = false;
 
-				return false;
+			string sOutput(pcInputFile);
+
+			iFileExtPos = sOutput.find('.');
+
+			if (iFileExtPos < 0)
+			{
+				sOutput += itInputList->sAppendToFileName;
+			}
+			else
+			{
+				int iNumberToErase = sOutput.length();
+
+				iNumberToErase -= iFileExtPos;
+
+				sOutput.erase(iFileExtPos, iNumberToErase);
+				//erase(iFileExtPos, sOutput.end());
+
+				sOutput += itInputList->sAppendToFileName;
+			}
+			if (fDest = fopen(sOutput.c_str(), "r"))
+			{
+				fclose(fDest);
+
+				if (!rename(sOutput.c_str(), cTempRenameFileName))
+				{
+					bOutputRenamed = true;
+				}
 
 			}
 
-			remove(cTempRenameFileName);
+			rename(cTempFilteredFileName, sOutput.c_str());
 
-			if (strlen(pcOutputFile))
+			if (bOutputRenamed)
 			{
-				bool bOutputRenamed = false;
-
-				if (fDest = fopen(pcOutputFile, "r"))
-				{
-					fclose(fDest);
-
-					if (!rename(pcOutputFile,cTempRenameFileName))
-					{
-						bOutputRenamed = true;
-					}
-
-				}
-
-
-				rename(cTempFilteredFileName, pcOutputFile);
-
-				if (bOutputRenamed)
-				{
-					remove(cTempRenameFileName);
-				}
+				remove(cTempRenameFileName);
 			}
-
-			bProducedAFilteredSpew = true;
 		}
 
-		return bProducedAFilteredSpew;
+		return true;
 	}
+
 }
