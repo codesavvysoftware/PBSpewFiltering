@@ -30,14 +30,16 @@ vector<string> InclusiveFiliters = {
 	"CBTPairSvc:",
 	"HFP:",
 	"[HCI]",
-	"[RFCOMM]"
+	"[RFCOMM]",
 	"[BtMonitorSvc]",
 	"PhoneCore:",
 	"BTPairApi!",
 	"PhoneGetConnectedCall:",
 	"CSyncManager:",
-	"AEC:"
+	"AEC:",
+	"CMAPManager:"
 };
+vector<string> MAPFilters = {	"CMAPManager:" };
 
 vector<sFilterDescriptor> FilterDescriptors
 { 
@@ -50,38 +52,15 @@ vector<sFilterDescriptor> FilterDescriptors
 		HFPFilters
 	},
 	{
+		"_Filtered_MAP.txt",
+		MAPFilters
+	},
+	{
 		"_Filtered_All.txt", 
 		InclusiveFiliters
 	} 
 }; 
 
-const char * cHFPFilterFields[] = { "HFP RX:",
-									 "HFP TX:",
-									 NULL };
-
-const char * cAllFilterFields[] = { "HFP RX:",
-                                    "HFP TX:",
-									 "CBTPairSvc",
-									 "ActionScript:",
-									 "Phone:",
-									 "HFPSvc:",
-									 "CHFPSvcManager:",
-									 "CBTPairSvc:",
-									 "HFP:",
-									 "[HCI]",
-									 "[RFCOMM]"
-									 "[BtMonitorSvc,",
-									 "PhoneCore:",
-									 "BTPairApi!",
-									 "PhoneGetConnectedCall:",
-									 "CSyncManager:",
-									 "AEC:",
-									 nullptr};
-
-const char * pcFilterForLinesNotSeparatedETC[] = { nullptr };
-
-const char * cActionScriptFilterFields[] = { "ActionScript:",
-                                              NULL }; 
 int _tmain(int argc, char* argv[])
 {
 	if (argc < 2)
@@ -102,7 +81,45 @@ int _tmain(int argc, char* argv[])
 
 	strncpy(cInputFile, argv[1], uiMaxFileNameSize - 2);
 
-	bNoFilterSuccess = !pgsdFilterSpew(cFolder, cInputFile, uiMaxFileNameSize, FilterDescriptors, sErrorMsg);
+	if (!SetCurrentDirectory(cFolder))
+	{
+		cout << "Could not set directory path for the file using default path" << endl;
+
+		return 1;
+	}
+
+	string sInputFileName(cInputFile);
+
+	auto iFileExtPos = sInputFileName.find('.');
+
+	if (iFileExtPos < 0)
+	{
+		sInputFileName += ".txt";
+	}
+
+	FILE * fSrc = fopen(sInputFileName.c_str(), "r");
+
+	if (!fSrc)
+	{
+		cout << "Error Opening Source File" << GetLastError() << endl;
+
+		return 1;
+	}
+
+	ReadLineInterfaceFactory rlif;
+	
+	unique_ptr<ReadLineInterface> rli = rlif.getReadLineInterface(fSrc, sErrorMsg);
+
+	if (rli == nullptr)
+	{
+		cout << "Text File Type Not Processed By this Program" << endl;
+
+		fclose(fSrc);
+
+		return 1;
+	}
+
+	bNoFilterSuccess = !pgsdFilterSpew(cFolder, cInputFile, uiMaxFileNameSize, *rli, FilterDescriptors, sErrorMsg);
     
 	if (bNoFilterSuccess)
 	{

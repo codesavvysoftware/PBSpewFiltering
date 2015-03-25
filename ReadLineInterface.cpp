@@ -8,12 +8,142 @@
 #include <codecvt>
 #include <sstream>
 #include <string>
+
 using namespace std;
 
 
 namespace ProcessPBSpews
 {
+	unique_ptr<ReadLineInterface> ReadLineInterfaceFactory::getReadLineInterface(FILE * fSrc, string & sErrorMsg)
+	{
+		TextFileType tft;
 
+		string s;
+
+		sErrorMsg = "";
+
+		if (FetchTextFileType(fSrc, tft, s))
+		{
+			switch (tft)
+			{
+			case UTF16LittleEndian:
+
+				return unique_ptr<ReadLineInterface>(new ReadUnicodeLine());
+
+			case UTF16BigEndian:
+
+				return unique_ptr<ReadLineInterface>(new ReadUnicodeBigEndianLine());
+
+			case UTF8:
+			case ANSI:
+
+				return unique_ptr<ReadLineInterface>(new ReadASCIILine());
+
+			defualt:
+
+				break;
+
+			}
+		}
+
+		sErrorMsg = "Text File Type Not Processed By this Program: " + s;
+
+		return unique_ptr<ReadLineInterface>(nullptr);
+	}
+
+	bool ReadLineInterfaceFactory::FetchTextFileType(FILE * fSrc, TextFileType & tftFileType, string & sErrorMsgRet) {
+		if (!fSrc) return false;
+
+		ostringstream osErrorMsgRet;
+
+		osErrorMsgRet << "";
+
+		long lCurrentStreamPos = ftell(fSrc);
+
+		if (fseek(fSrc, 0, SEEK_SET))
+		{
+			return false;
+		}
+
+		char c[20];
+
+		int result = fread(c, 1, 1, fSrc);
+
+		if (result != 1)
+		{
+			return false;
+		}
+
+		unsigned char uc = c[0];
+
+		/* Bytes 	Encoding Form
+			  00 00 FE FF 	UTF - 32, big - endian
+			  FF FE 00 00 	UTF - 32, little - endian
+			  FE FF 	        UTF - 16, big - endian
+			  FF FE 	        UTF - 16, little - endian
+			  EF BB BF 	    UTF - 8 */
+		if (uc == 0)
+		{
+			fseek(fSrc, lCurrentStreamPos, SEEK_SET);
+
+			tftFileType = UTF32BigEndian;
+
+			return true;
+		}
+
+		if (uc == 0xFE)
+		{
+			fseek(fSrc, lCurrentStreamPos, SEEK_SET);
+
+			tftFileType = UTF16BigEndian;
+
+			return true;
+		}
+
+		if (uc == 0xEF)
+		{
+			fseek(fSrc, lCurrentStreamPos, SEEK_SET);
+
+			tftFileType = UTF8;
+
+			return true;
+		}
+
+		if (uc == 0xFF)
+		{
+			if (fseek(fSrc, 2, SEEK_SET))
+			{
+				return false;
+			}
+
+			int result = fread(c, 1, 1, fSrc);
+
+			if (result != 1)
+			{
+				return false;
+			}
+
+			if (c[0] == 0)
+			{
+				tftFileType = UTF32LittleEndian;
+			}
+			else
+			{
+				tftFileType = UTF16LittleEndian;
+			}
+
+			fseek(fSrc, lCurrentStreamPos, SEEK_SET);
+
+			return true;
+		}
+
+		tftFileType = ANSI;
+
+		fseek(fSrc, lCurrentStreamPos, SEEK_SET);
+
+		return true;
+
+	}
 	ReadLineInterface::ReadLineInterface()
 	{
 	}
@@ -26,6 +156,8 @@ namespace ProcessPBSpews
 	bool ReadUnicodeLine::operator()
 		(FILE * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile)
 	{
+		if (!f || !pcLineBuffer) return false;
+
 		bEndOfFile = false;
 
 		wchar_t wideBuffer[20000];
@@ -46,7 +178,7 @@ namespace ProcessPBSpews
 			{
 				result = fread(pWideBuf, 1, lSize, f);
 			}
-			catch (int e)
+			catch (...)
 			{
 				return false;
 			}
@@ -101,6 +233,8 @@ namespace ProcessPBSpews
 	bool ReadASCIILine::operator()
 		(FILE * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile)
 	{
+		if (!f || !pcLineBuffer) return false;
+
 		bEndOfFile = false;
 
 		char narrowBuffer[2000];
@@ -154,6 +288,93 @@ namespace ProcessPBSpews
 	}
 
 
+	bool ReadUnicodeBigEndianLine::operator()
+		(FILE * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile)
+	{
+		if (!f || !pcLineBuffer) return false;
+
+		bEndOfFile = false;
+
+		wchar_t wideBuffer[20000];
+
+		wchar_t * pWideBuf = wideBuffer;
+
+		char EndianReadFirst;
+
+		char EndianReadSecond;
+
+		unsigned int uiNumRead = 0;
+
+		long lSize = sizeof(wchar_t);
+
+		size_t result;
+
+		bool bLineFeedNotRead = true;
+
+		while (bLineFeedNotRead)
+		{
+			wchar_t wct = 0;
+
+			result = fread(&wct, 1, lSize, f);
+
+			if (result != lSize)
+			{
+				bEndOfFile = true;
+
+				break;
+			}
+
+			char cSwap = (wct & 0xff00) >> 8;
+
+			wct &= 0xff;
+
+			wct <<= 8;
+
+			wct |= cSwap;
+
+			*pWideBuf = wct;
+
+			uiNumRead += lSize;
+
+			if ((*pWideBuf == L'\n') || (*pWideBuf == L'\r'))
+			{
+				if ((*pWideBuf == L'\r'))
+				{
+					*pWideBuf = L'\n';
+				}
+
+				setlocale(LC_ALL, "en-US");
+
+				const locale locale("");
+
+				pWideBuf++;
+
+				*pWideBuf = L'\0';
+
+				wstring ws(wideBuffer);
+
+				typedef codecvt_utf8<wchar_t> convert_typeX;
+
+				wstring_convert<convert_typeX, wchar_t> converterX;
+
+				unsigned int ui = ws.length();
+
+				string s = converterX.to_bytes(ws);
+
+				strcpy(pcLineBuffer, s.c_str());
+
+				bLineFeedNotRead = false;
+			}
+
+			pWideBuf++;
+		}
+
+		uiNumberOfCharsRead = uiNumRead;
+
+		return !bLineFeedNotRead;
+	}
+
+
 	GenerateFilteredSpewData::GenerateFilteredSpewData()
 	{
 	}
@@ -162,9 +383,12 @@ namespace ProcessPBSpews
 	GenerateFilteredSpewData::~GenerateFilteredSpewData()
 	{
 	}
+
 	void GenerateFilteredSpewData::StripLeadingBlanks(char * pcLineBuffer, char ** pcNewBuffer)
 	{
-		int i;
+		if (!pcLineBuffer || !pcNewBuffer || !(*pcNewBuffer)) return;
+
+		auto i = 0;
 
 		for (i = 0; (pcLineBuffer[i] != '\n') && (pcLineBuffer[i] != '\r'); i++)
 		{
@@ -177,62 +401,16 @@ namespace ProcessPBSpews
 		*pcNewBuffer = &pcLineBuffer[i];
 	}
 
-	bool GenerateFilteredSpewData::FindFieldStr(const char * pcFields[], char * pcStartOfField)
-	{
-		if (pcFields[0] == nullptr)
-		{
-			return true;
-		}
-
-		int i = 0;
-
-		const char * pcFieldStr;
-
-		bool bFieldFound = false;
-
-		while (pcFields[i] != nullptr)
-		{
-			pcFieldStr = pcFields[i];
-
-			int iLenToCheck = strlen(pcFieldStr);
-
-			unsigned int uiCurrentPos = 0;
-
-			while (true)
-			{
-				if (!strncmp(pcFieldStr, &pcStartOfField[uiCurrentPos], iLenToCheck))
-
-					/*		if (
-					(pcStartOfPID[uiCurrentPos]     == 'P')
-					&& (pcStartOfPID[uiCurrentPos + 1] == 'I')
-					&& (pcStartOfPID[uiCurrentPos + 2] == 'D')
-					&& (pcStartOfPID[uiCurrentPos + 3] == ':')
-					)*/
-				{
-					pcStartOfField += uiCurrentPos;
-
-					bFieldFound = true;
-
-					break;
-				}
-				else if (pcStartOfField[uiCurrentPos] == '\n')
-				{
-					break;
-				}
-				else
-				{
-					uiCurrentPos++;
-				}
-			}
-
-			i++;
-		}
-
-		return bFieldFound;
-	}
 	bool GenerateFilteredSpewData::operator()
-		(const char * pcFolder, const char * pcInputFile, unsigned int uiMaxFileNameSize, vector<sFilterDescriptor> & lFilterDescriptors, string & sErrorMsgRet)
+		(const char *                pcFolder,
+		const char *                pcInputFile,
+		unsigned int                uiMaxFileNameSize,
+		ReadLineInterface &         ReadSourceLine,
+		vector<sFilterDescriptor> & lFilterDescriptors,
+		string &                    sErrorMsgRet)
 	{
+		if (!pcFolder || !pcInputFile) return false;
+
 		ostringstream osErrorMsgRet;
 
 		osErrorMsgRet << "";
@@ -250,17 +428,17 @@ namespace ProcessPBSpews
 			return false;
 		}
 
-		int iCurrentDescriptor = 0;
-		
+		auto iCurrentDescriptor = 0;
+
 		string sInputFileName(pcInputFile);
 
-		int iFileExtPos = sInputFileName.find('.');
+		auto iFileExtPos = sInputFileName.find('.');
 
 		if (iFileExtPos < 0)
 		{
 			sInputFileName += ".txt";
 		}
-			
+
 		FILE * fSrc = fopen(sInputFileName.c_str(), "r");
 
 		if (!fSrc)
@@ -285,100 +463,24 @@ namespace ProcessPBSpews
 			return false;
 		}
 
-		bool bProducedAFilteredSpew = false;
+		bool bUnfilteredFileLinesCollected = CollectUnfilteredFileLines(fSrc, ReadSourceLine, sErrorMsgRet);
 
-		char cLineBuffer[100000];
+		if (bUnfilteredFileLinesCollected) {
 
-		unsigned int uiBufferSizeMax = 100000;
-
-		unsigned int uiNumberOfCharsRead;
-
-		bool bEndOfFile = false;
-
-		char * pcLineBuffer = cLineBuffer;
-
-		bool bFileHeaderInfoRead = false;
-
-		ReadUnicodeLine rulReadUnicode;
-
-		ReadASCIILine rulReadASCII;
-
-		while (!bEndOfFile)
-		{
-
-			bool bLineReadSuccess = false;
-			
-			try
-			{
-				bLineReadSuccess = rulReadUnicode(fSrc, pcLineBuffer, uiBufferSizeMax, uiNumberOfCharsRead, bEndOfFile);
-			}
-			catch (int e)
-			{
-				osErrorMsgRet << "Error with source file probably not saved as in Unicode format.  Hopefully will be fixed shortly so all input format work" << GetLastError() << endl;
-
-				sErrorMsgRet = osErrorMsgRet.str();
-
-				return false;
-			}
-
-			
-			if (bLineReadSuccess)
-			{
-				if (bEndOfFile)
-				{
-					break;
-				}
-				else if (uiNumberOfCharsRead == uiBufferSizeMax)
-				{
-					osErrorMsgRet << "Read Buffer Not Big Enough" << endl;
-
-					break;
-				}
-				else
-				{
-					osErrorMsgRet << "Error Reading File" << endl;
-
-					break;
-				}
-			}
-
-
-			StripLeadingBlanks(pcLineBuffer, &pcLineBuffer);
-
-			int i = 0;
-
-			for (i = 0; pcLineBuffer[i] != '\n'; i++)
-			{
-				if (pcLineBuffer[i] == '\r')
-				{
-					pcLineBuffer[i] = '\n';
-				}
-			}
-
-			if (pcLineBuffer[0] != '\n')
-			{
-				FileLines.emplace_back(pcLineBuffer);
-
-				fwrite(pcLineBuffer, sizeof(char), strlen(pcLineBuffer), fDest);
+			//for (vector<string>::iterator iter = FileLines.begin(); iter != FileLines.end(); iter++)
+			for (string& iterS : UnfilteredFileLines) {
+				fwrite(iterS.c_str(), sizeof(char), strlen(iterS.c_str()), fDest);
 
 				fflush(fDest);
-
-
 			}
 		}
-
-		if (!bEndOfFile)
-		{
-			sErrorMsgRet = osErrorMsgRet.str();
-
-			return false;
-
-		}
-
+		
 		fclose(fSrc);
 
 		fclose(fDest);
 
+		if (!bUnfilteredFileLinesCollected) return false;
+		
 		remove(cTempRenameFileName);
 
 		string sOutput(pcInputFile);
@@ -391,18 +493,17 @@ namespace ProcessPBSpews
 		}
 		else
 		{
-			int iNumberToErase = sOutput.length();
+			auto iNumberToErase = sOutput.length();
 
 			iNumberToErase -= iFileExtPos;
 
 			sOutput.erase(iFileExtPos, iNumberToErase);
-			//erase(iFileExtPos, sOutput.end());
 
 			sOutput += "_New_Unfiltered.txt";
 		}
 
 		//vector<string> sToFilterOn = { "Garbage", "Data" };
-		bool bOutputRenamed = false;
+		auto bOutputRenamed = false;
 
 		if (fDest = fopen(sOutput.c_str(), "r"))
 		{
@@ -410,7 +511,7 @@ namespace ProcessPBSpews
 
 			if (!rename(sOutput.c_str(), cTempRenameFileName))
 			{
-					bOutputRenamed = true;
+				bOutputRenamed = true;
 			}
 
 		}
@@ -423,7 +524,7 @@ namespace ProcessPBSpews
 		}
 
 
-		for (vector<sFilterDescriptor>::iterator itInputList = lFilterDescriptors.begin(); itInputList != lFilterDescriptors.end(); itInputList++)
+		for (sFilterDescriptor& InputList : lFilterDescriptors)
 		{
 			fDest = fopen(cTempFilteredFileName, "w+");
 
@@ -436,27 +537,13 @@ namespace ProcessPBSpews
 				continue;
 			}
 
-			for (vector<string>::iterator iter = FileLines.begin(); iter != FileLines.end(); iter++)
-			{
-				vector<string>::iterator iterFilters = itInputList->sToFilterOn.begin();
+			CollectFilteredFileLines(UnfilteredFileLines, InputList);
 
-				vector<string>::iterator iterFiltersEnd = itInputList->sToFilterOn.end();
+			for (string & iterS : InputList.FilteredFileLines) {
+				
+				fwrite(iterS.c_str(), sizeof(char), strlen(iterS.c_str()), fDest);
 
-				while (iterFilters != iterFiltersEnd)
-				//while (0 != itInputList->sToFilterOn[i].length())
-				{
-					size_t found = iter->find(iterFilters->c_str());//   itInputList->sToFilterOn[i]);
-
-					if (found != string::npos)
-					{
-						fwrite(iter->c_str(), sizeof(char), strlen(iter->c_str()), fDest);
-
-						fflush(fDest);
-
-						break;
-					}
-					iterFilters++;
-				}
+				fflush(fDest);
 			}
 
 			fclose(fDest);
@@ -469,7 +556,7 @@ namespace ProcessPBSpews
 
 			if (iFileExtPos < 0)
 			{
-				sOutput += itInputList->sAppendToFileName;
+				sOutput += InputList.sAppendToFileName;
 			}
 			else
 			{
@@ -478,10 +565,10 @@ namespace ProcessPBSpews
 				iNumberToErase -= iFileExtPos;
 
 				sOutput.erase(iFileExtPos, iNumberToErase);
-				//erase(iFileExtPos, sOutput.end());
 
-				sOutput += itInputList->sAppendToFileName;
+				sOutput += InputList.sAppendToFileName;
 			}
+
 			if (fDest = fopen(sOutput.c_str(), "r"))
 			{
 				fclose(fDest);
@@ -504,4 +591,107 @@ namespace ProcessPBSpews
 		return true;
 	}
 
+	void GenerateFilteredSpewData::CollectFilteredFileLines(vector<string>& UnfilteredFileLines, sFilterDescriptor& InputList)
+	{
+		//for (vector<string>::iterator iter = FileLines.begin(); iter != FileLines.end(); iter++)
+		for (string& iterS : UnfilteredFileLines)
+		{
+			vector<string> vStart = InputList.sToFilterOn;
+
+			for (string& sFilter : vStart)// = StartIterating; iterFilters != EndIterating; iterFilters++ )
+			{
+				auto found = iterS.find(sFilter.c_str());// iterFilters->c_str());//   itInputList->sToFilterOn[i]);
+
+				if (found != string::npos)
+				{
+					InputList.FilteredFileLines.push_back(iterS);
+				}
+			}
+		}
+	}
+
+	bool GenerateFilteredSpewData::CollectUnfilteredFileLines(FILE * fSrc, ReadLineInterface &  ReadSourceLine, string & sErrorMsgRet) {
+		char cLineBuffer[100000];
+
+		ostringstream osErrorMsgRet;
+
+		osErrorMsgRet << "";
+
+		unsigned int uiNumberOfCharsRead = 0;
+
+		unsigned int uiBufferSizeMax = uiMaxBufferSize;
+
+		auto bCollectionSuccess = true;
+
+		auto bEndOfFile = false;
+
+		auto pcLineBuffer = cLineBuffer;
+
+		auto bFileHeaderInfoRead = false;
+
+		while (!bEndOfFile)
+		{
+
+			auto bLineReadNotSuccessful = true;
+
+			try
+			{
+				bLineReadNotSuccessful = !ReadSourceLine(fSrc, pcLineBuffer, uiBufferSizeMax, uiNumberOfCharsRead, bEndOfFile);
+			}
+			catch (...)
+			{
+				osErrorMsgRet << "Spew source incompatible with supported test file formats: " << GetLastError() << endl;
+
+				sErrorMsgRet = osErrorMsgRet.str();
+
+				return false;
+			}
+
+			if (bLineReadNotSuccessful)
+			{
+				if (bEndOfFile)
+				{
+					bEndOfFile = true;
+
+					break;
+				}
+				else if (uiNumberOfCharsRead == uiBufferSizeMax)
+				{
+					osErrorMsgRet << "Read Buffer Not Big Enough" << endl;
+
+					break;
+				}
+				else
+				{
+					osErrorMsgRet << "Error Reading File" << endl;
+
+					break;
+				}
+			}
+
+			StripLeadingBlanks(pcLineBuffer, &pcLineBuffer);
+
+			for (auto i = 0; pcLineBuffer[i] != '\n'; i++)
+			{
+				if (pcLineBuffer[i] == '\r')
+				{
+					pcLineBuffer[i] = '\n';
+				}
+			}
+
+			if (pcLineBuffer[0] != '\n')
+			{
+				UnfilteredFileLines.emplace_back(pcLineBuffer);
+			}
+		}
+
+		if (!bEndOfFile)
+		{
+			sErrorMsgRet = osErrorMsgRet.str();
+
+			return false;
+		}
+
+		return true;
+	}
 }
