@@ -1,3 +1,5 @@
+#ifndef PROCESSPBSPEW_H_
+#define PROCESSPBSPEW_H_
 #pragma once
 #include <stdio.h>
 #include <string>
@@ -5,7 +7,6 @@
 #include <vector>
 #include <array>
 #include <memory>
-using namespace std;
 
 namespace ProcessPBSpews {
 	const unsigned int uiMaxFileNameSize = 150;
@@ -13,11 +14,13 @@ namespace ProcessPBSpews {
 	const unsigned int uiMaxBufferSize = 10000;
 
 	typedef struct {
-		string sAppendToFileName;
+		std::string sAppendToFileName;
 
-		vector<string> sToFilterOn;
+		std::vector<std::string> sToFilterOn;
 
-		vector<string> FilteredFileLines;
+		std::string sFileNameToWrite;
+
+		std::vector<std::string> FilteredFileLines;
 	} sFilterDescriptor;
 	typedef enum FileTypesForText{
 		UTF32BigEndian,
@@ -28,6 +31,17 @@ namespace ProcessPBSpews {
 		ANSI
 	}TextFileType;
 	
+    extern std::vector<sFilterDescriptor> ProduceAllFilterDescriptor;
+
+    extern std::vector<sFilterDescriptor> ProducePhoneFilterDescriptor;
+
+    extern std::vector<sFilterDescriptor> ProduceInclusiveFilterDescriptor;
+
+	extern std::vector<sFilterDescriptor> ProduceHFPFilterDescriptor;
+
+	extern std::vector<sFilterDescriptor> ProduceActionScriptFilterDescriptor;
+
+
 	class ReadLineInterface;
 
 	class ReadLineInterfaceFactory
@@ -41,10 +55,10 @@ namespace ProcessPBSpews {
 
 		ReadLineInterfaceFactory &operator=(const ReadLineInterfaceFactory &) { return *this; }
 
-		unique_ptr<ReadLineInterface> ReadLineInterfaceFactory::getReadLineInterface(FILE * fSrc, string & sErrorMsg);
+		std::unique_ptr<ReadLineInterface> getReadLineInterface(std::string sFile, std::string & sErrorMsg);
 
 	private:
-		bool FetchTextFileType(FILE * fSrc, TextFileType & tftFileType, string & sErrorMsgRet);
+		bool FetchTextFileType(FILE * fSrc, TextFileType & tftFileType, std::string & sErrorMsgRet);
 	};
 
 	class ReadLineInterface
@@ -58,7 +72,7 @@ namespace ProcessPBSpews {
 
 	protected:
 
-		vector<string> FileLines;
+		std::vector<std::string> FileLines;
 	};
 	class ReadUnicodeLine : public ReadLineInterface
 	{
@@ -89,22 +103,25 @@ namespace ProcessPBSpews {
 		~GenerateFilteredSpewData();
 
 		virtual bool operator()
-			(const char *                pcFolder, 
-			 const char *                pcInputFile, 
+			(std::string &               sInputFileName,
+			 std::string &               sOutputFileName,
 			 unsigned int                uiMaxFileNameSize, 
 			 ReadLineInterface &         ReadSourceLine,
-			 vector<sFilterDescriptor> & lFileDescriptors, 
-			 string &                    sErrorMsgRet);
+			 std::vector<sFilterDescriptor> & lFileDescriptors,
+			 std::string &                    sErrorMsgRet);
 
-		bool GenerateFilteredSpewData::CollectUnfilteredFileLines(FILE * fSrc, ReadLineInterface&  ReadSourceLine, string & sErrorMsgRet);
+		bool CollectUnfilteredFileLines(FILE * fSrc, ReadLineInterface&  ReadSourceLine, std::string & sErrorMsgRet);
 
-		void GenerateFilteredSpewData::CollectFilteredFileLines(vector<string>& UnfilteredFileLines, sFilterDescriptor& InputList);
+		void CollectFilteredFileLines(std::vector<std::string>& UnfilteredFileLines, sFilterDescriptor& InputList);
 
 	private:
 		void StripLeadingBlanks(char * pcLineBuffer, char ** pcNewBuffer);
 
-		vector<string> UnfilteredFileLines;
+		void AppendFileNameSuffix( std::string & sFileName, const std::string & sSuffix );
+
+		std::vector<std::string> UnfilteredFileLines;
 
 	};
 
 };
+#endif

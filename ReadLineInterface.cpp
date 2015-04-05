@@ -1,43 +1,153 @@
-#include "stdafx.h"
 #include "ReadLineInterface.h"
 #include <iostream>
-#include <windows.h>
-#include <tchar.h>
-#include <string>
 #include <locale>
-#include <codecvt>
 #include <sstream>
 #include <string>
+#include <string.h>
+#include <boost/locale.hpp>
+#include <fstream>
 
-using namespace std;
+//#include <codecvt>
 
 
-namespace ProcessPBSpews
-{
-	unique_ptr<ReadLineInterface> ReadLineInterfaceFactory::getReadLineInterface(FILE * fSrc, string & sErrorMsg)
+namespace ProcessPBSpews {
+    std::vector<std::string> AsFileFilters = { "ActionScript:" };
+
+    std::vector<std::string> HFPFilters = { "HFP RX:", "HFP TX:" };
+
+    std::vector<std::string> BTPhoneFilters = {
+		"HFP RX:",
+		"HFP TX:",
+		"CBTPairSvc",
+		"Phone:",
+		"HFPSvc:",
+		"CHFPSvcManager:",
+		"CBTPairSvc:",
+		"HFP:",
+		"PhoneCore:",
+		"BTPairApi!",
+		"PhoneGetConnectedCall:",
+		"CSyncManager:",
+     	"CMAPManager:" };
+
+    std::vector<std::string> ReadableFilters = { " " };
+
+    std::vector<std::string> InclusiveFiliters = {
+    	"HFP RX:",
+    	"HFP TX:",
+    	"CBTPairSvc",
+    	"ActionScript:",
+    	"Phone:",
+    	"HFPSvc:",
+    	"CHFPSvcManager:",
+    	"CBTPairSvc:",
+    	"HFP:",
+    	"[HCI]",
+    	"[RFCOMM]",
+    	"[BtMonitorSvc]",
+    	"PhoneCore:",
+    	"BTPairApi!",
+    	"PhoneGetConnectedCall:",
+    	"CSyncManager:",
+    	"AEC:",
+    	"CMAPManager:"
+    };
+
+    std::vector<std::string> MAPFilters = {	"CMAPManager:" };
+
+    std::vector<sFilterDescriptor> ProduceAllFilterDescriptor
+    {
+    	{
+    		"_Filtered_AS.txt",
+    		//Only because VS 2013 express version I have doesn't work with this c-11 initialization
+    		AsFileFilters //{ { "ActionScript:" } }
+    	},
+    	{
+    			"_Filtered_HFP.txt",
+    			HFPFilters
+    	},
+    	{
+    			"_Filtered_MAP.txt",
+    			MAPFilters
+    	},
+    	{
+    			"_Filtered_All.txt",
+    			InclusiveFiliters
+    	},
+    	{
+    			"_Filtered_Phone.txt",
+    			BTPhoneFilters
+    	}
+    };
+
+    std::vector<sFilterDescriptor> ProducePhoneFilterDescriptor
+    {
+		{
+			"_Filtered_Phone.txt",
+			BTPhoneFilters
+		}
+    };
+
+    std::vector<sFilterDescriptor> ProduceInclusiveFilterDescriptor
+	{
+		{
+			"_Filtered_All.txt",
+			InclusiveFiliters
+		}
+	};
+
+	std::vector<sFilterDescriptor> ProduceActionScriptFilterDescriptor
+	{
+		{
+			"_Filtered_AS.txt",
+			//Only because VS 2013 express version I have doesn't work with this c-11 initialization
+			AsFileFilters //{ { "ActionScript:" } }
+		}
+	};
+
+	std::vector<sFilterDescriptor> ProduceHFPFilterDescriptor
+	{
+		{
+			"_Filtered_HFP.txt",
+			HFPFilters
+		}
+	};
+	std::unique_ptr<ReadLineInterface> ReadLineInterfaceFactory::getReadLineInterface(std::string sFile, std::string & sErrorMsg)
 	{
 		TextFileType tft;
 
-		string s;
+		std::string s;
 
 		sErrorMsg = "";
 
-		if (FetchTextFileType(fSrc, tft, s))
+		FILE * fSrc = fopen(sFile.c_str(), "r");
+
+		if (!fSrc)
 		{
+			sErrorMsg = "Error Opening Source File";
+
+			return std::unique_ptr<ReadLineInterface>(nullptr);
+		}
+
+		bool bFileTypeWasFetched = FetchTextFileType(fSrc, tft, s);
+
+		fclose(fSrc);
+
+		if (bFileTypeWasFetched) {
 			switch (tft)
 			{
 			case UTF16LittleEndian:
 
-				return unique_ptr<ReadLineInterface>(new ReadUnicodeLine());
+				return std::unique_ptr<ReadLineInterface>(new ReadUnicodeLine());
 
 			case UTF16BigEndian:
 
-				return unique_ptr<ReadLineInterface>(new ReadUnicodeBigEndianLine());
+				return std::unique_ptr<ReadLineInterface>(new ReadUnicodeBigEndianLine());
 
 			case UTF8:
 			case ANSI:
 
-				return unique_ptr<ReadLineInterface>(new ReadASCIILine());
+				return std::unique_ptr<ReadLineInterface>(new ReadASCIILine());
 
 			defualt:
 
@@ -48,13 +158,13 @@ namespace ProcessPBSpews
 
 		sErrorMsg = "Text File Type Not Processed By this Program: " + s;
 
-		return unique_ptr<ReadLineInterface>(nullptr);
+		return std::unique_ptr<ReadLineInterface>(nullptr);
 	}
 
-	bool ReadLineInterfaceFactory::FetchTextFileType(FILE * fSrc, TextFileType & tftFileType, string & sErrorMsgRet) {
+	bool ReadLineInterfaceFactory::FetchTextFileType(FILE * fSrc, TextFileType & tftFileType, std::string & sErrorMsgRet) {
 		if (!fSrc) return false;
 
-		ostringstream osErrorMsgRet;
+		std::ostringstream osErrorMsgRet;
 
 		osErrorMsgRet << "";
 
@@ -166,11 +276,15 @@ namespace ProcessPBSpews
 
 		unsigned int uiNumRead = 0;
 
-		long lSize = sizeof(wchar_t);
+		long lSize = 2;
 
 		size_t result;
 
 		bool bLineFeedNotRead = true;
+
+		setlocale(LC_ALL, "en-US");
+
+		const std::locale locale("");
 
 		while (bLineFeedNotRead)
 		{
@@ -199,23 +313,11 @@ namespace ProcessPBSpews
 					*pWideBuf = L'\n';
 				}
 
-				setlocale(LC_ALL, "en-US");
-
-				const locale locale("");
-
 				pWideBuf++;
 
 				*pWideBuf = L'\0';
 
-				wstring ws(wideBuffer);
-
-				typedef codecvt_utf8<wchar_t> convert_typeX;
-
-				wstring_convert<convert_typeX, wchar_t> converterX;
-
-				unsigned int ui = ws.length();
-
-				string s = converterX.to_bytes(ws);
+				std::string s = boost::locale::conv::utf_to_utf<char>(wideBuffer, pWideBuf);
 
 				strcpy(pcLineBuffer, s.c_str());
 
@@ -305,11 +407,15 @@ namespace ProcessPBSpews
 
 		unsigned int uiNumRead = 0;
 
-		long lSize = sizeof(wchar_t);
+		long lSize = 2;
 
 		size_t result;
 
 		bool bLineFeedNotRead = true;
+
+		setlocale(LC_ALL, "en-US");
+
+		const std::locale locale("");
 
 		while (bLineFeedNotRead)
 		{
@@ -343,23 +449,11 @@ namespace ProcessPBSpews
 					*pWideBuf = L'\n';
 				}
 
-				setlocale(LC_ALL, "en-US");
-
-				const locale locale("");
-
 				pWideBuf++;
 
 				*pWideBuf = L'\0';
 
-				wstring ws(wideBuffer);
-
-				typedef codecvt_utf8<wchar_t> convert_typeX;
-
-				wstring_convert<convert_typeX, wchar_t> converterX;
-
-				unsigned int ui = ws.length();
-
-				string s = converterX.to_bytes(ws);
+				std::string s = boost::locale::conv::utf_to_utf<char>(wideBuffer, pWideBuf);
 
 				strcpy(pcLineBuffer, s.c_str());
 
@@ -402,61 +496,52 @@ namespace ProcessPBSpews
 	}
 
 	bool GenerateFilteredSpewData::operator()
-		(const char *                pcFolder,
-		const char *                pcInputFile,
-		unsigned int                uiMaxFileNameSize,
-		ReadLineInterface &         ReadSourceLine,
-		vector<sFilterDescriptor> & lFilterDescriptors,
-		string &                    sErrorMsgRet)
+		(std::string  &                   sInputFileName,
+	     std::string  &                   sOutputFileName,
+		 unsigned int                     uiMaxFileNameSize,
+		 ReadLineInterface &              ReadSourceLine,
+		 std::vector<sFilterDescriptor> & lFilterDescriptors,
+		 std::string &                    sErrorMsgRet)
 	{
-		if (!pcFolder || !pcInputFile) return false;
+		if (sInputFileName.empty() || sOutputFileName.empty()) return false;
 
-		ostringstream osErrorMsgRet;
+		const std::string sInputFileSuffix(".txt");
+
+		const std::string sOutputFileUnfilteredSuffix("_New_Unfiltered.txt");
+
+		std::ostringstream osErrorMsgRet;
 
 		osErrorMsgRet << "";
 
-		const char cTempFilteredFileName[] = "Temp.txt";
+		std::string sInputFile = sInputFileName;
 
-		const char cTempRenameFileName[] = "Temp.$$$";
+		std::string sOutputFileUnfiltered = sOutputFileName;
 
-		if (!SetCurrentDirectory(pcFolder))
-		{
-			osErrorMsgRet << "Could not set directory path for the file using default path" << endl;
+		AppendFileNameSuffix(sInputFile, sInputFileSuffix);
 
-			sErrorMsgRet = osErrorMsgRet.str();
+        AppendFileNameSuffix(sOutputFileUnfiltered,sOutputFileUnfilteredSuffix );
 
-			return false;
-		}
-
-		auto iCurrentDescriptor = 0;
-
-		string sInputFileName(pcInputFile);
-
-		auto iFileExtPos = sInputFileName.find('.');
-
-		if (iFileExtPos < 0)
-		{
-			sInputFileName += ".txt";
-		}
-
-		FILE * fSrc = fopen(sInputFileName.c_str(), "r");
+		//
+		// Open the input file read it and fix lines terminate at '\r' only saving the output in a temporary file
+		//
+		FILE * fSrc = fopen(sInputFile.c_str(), "r");
 
 		if (!fSrc)
 		{
-			osErrorMsgRet << "Error Opening Source File" << GetLastError() << endl;
+			osErrorMsgRet << "Error Opening Source File" << std::endl;//GetLastError() << endl;
 
 			sErrorMsgRet = osErrorMsgRet.str();
 
 			return false;
 		}
 
-		FILE * fDest = fopen(cTempFilteredFileName, "w+");
+		FILE * fDest = fopen(sOutputFileUnfiltered.c_str(), "w+");
 
 		if (!fDest)
 		{
 			fclose(fSrc);
 
-			osErrorMsgRet << "Error opening destination file" << GetLastError() << endl;
+			osErrorMsgRet << "Error opening unfiltered output file for write" << std::endl;//GetLastError() << endl;
 
 			sErrorMsgRet = osErrorMsgRet.str();
 
@@ -467,8 +552,8 @@ namespace ProcessPBSpews
 
 		if (bUnfilteredFileLinesCollected) {
 
-			//for (vector<string>::iterator iter = FileLines.begin(); iter != FileLines.end(); iter++)
-			for (string& iterS : UnfilteredFileLines) {
+			//for (std::vector<std::string>::iterator iter = FileLines.begin(); iter != FileLines.end(); iter++)
+			for (std::string& iterS : UnfilteredFileLines) {
 				fwrite(iterS.c_str(), sizeof(char), strlen(iterS.c_str()), fDest);
 
 				fflush(fDest);
@@ -481,56 +566,24 @@ namespace ProcessPBSpews
 
 		if (!bUnfilteredFileLinesCollected) return false;
 		
-		remove(cTempRenameFileName);
-
-		string sOutput(pcInputFile);
-
-		iFileExtPos = sOutput.find('.');
-
-		if (iFileExtPos < 0)
-		{
-			sOutput += "_New_Unfiltered.txt";
-		}
-		else
-		{
-			auto iNumberToErase = sOutput.length();
-
-			iNumberToErase -= iFileExtPos;
-
-			sOutput.erase(iFileExtPos, iNumberToErase);
-
-			sOutput += "_New_Unfiltered.txt";
-		}
-
-		//vector<string> sToFilterOn = { "Garbage", "Data" };
-		auto bOutputRenamed = false;
-
-		if (fDest = fopen(sOutput.c_str(), "r"))
-		{
-			fclose(fDest);
-
-			if (!rename(sOutput.c_str(), cTempRenameFileName))
-			{
-				bOutputRenamed = true;
-			}
-
-		}
-
-		rename(cTempFilteredFileName, sOutput.c_str());
-
-		if (bOutputRenamed)
-		{
-			remove(cTempRenameFileName);
-		}
-
+		//
+		// At this point the input file has been read and processed.  All lines that end in \r only have been changed
+		// so that they now contain a \n instead.  sTempFilteredFie contains the processed sInputFileName file.
+		//
 
 		for (sFilterDescriptor& InputList : lFilterDescriptors)
 		{
-			fDest = fopen(cTempFilteredFileName, "w+");
+			std::string sOutputFileUnfiltered = sOutputFileName;
+
+	        AppendFileNameSuffix(sOutputFileUnfiltered,InputList.sAppendToFileName );
+
+	        InputList.sFileNameToWrite = sOutputFileUnfiltered;
+
+			fDest = fopen(sOutputFileUnfiltered.c_str(), "w+");
 
 			if (!fDest)
 			{
-				osErrorMsgRet << "Error opening destination file" << GetLastError() << endl;
+				osErrorMsgRet << "Error opening destination file" << std::endl; //GetLastError() << endl;
 
 				sErrorMsgRet = osErrorMsgRet.str();
 
@@ -539,7 +592,7 @@ namespace ProcessPBSpews
 
 			CollectFilteredFileLines(UnfilteredFileLines, InputList);
 
-			for (string & iterS : InputList.FilteredFileLines) {
+			for (std::string & iterS : InputList.FilteredFileLines) {
 				
 				fwrite(iterS.c_str(), sizeof(char), strlen(iterS.c_str()), fDest);
 
@@ -548,61 +601,23 @@ namespace ProcessPBSpews
 
 			fclose(fDest);
 
-			bOutputRenamed = false;
-
-			string sOutput(pcInputFile);
-
-			iFileExtPos = sOutput.find('.');
-
-			if (iFileExtPos < 0)
-			{
-				sOutput += InputList.sAppendToFileName;
-			}
-			else
-			{
-				int iNumberToErase = sOutput.length();
-
-				iNumberToErase -= iFileExtPos;
-
-				sOutput.erase(iFileExtPos, iNumberToErase);
-
-				sOutput += InputList.sAppendToFileName;
-			}
-
-			if (fDest = fopen(sOutput.c_str(), "r"))
-			{
-				fclose(fDest);
-
-				if (!rename(sOutput.c_str(), cTempRenameFileName))
-				{
-					bOutputRenamed = true;
-				}
-
-			}
-
-			rename(cTempFilteredFileName, sOutput.c_str());
-
-			if (bOutputRenamed)
-			{
-				remove(cTempRenameFileName);
-			}
 		}
 
 		return true;
 	}
 
-	void GenerateFilteredSpewData::CollectFilteredFileLines(vector<string>& UnfilteredFileLines, sFilterDescriptor& InputList)
+	void GenerateFilteredSpewData::CollectFilteredFileLines(std::vector<std::string>& UnfilteredFileLines, sFilterDescriptor& InputList)
 	{
-		//for (vector<string>::iterator iter = FileLines.begin(); iter != FileLines.end(); iter++)
-		for (string& iterS : UnfilteredFileLines)
+		//for (std::vector<std::string>::iterator iter = FileLines.begin(); iter != FileLines.end(); iter++)
+		for (std::string& iterS : UnfilteredFileLines)
 		{
-			vector<string> vStart = InputList.sToFilterOn;
+			std::vector<std::string> vStart = InputList.sToFilterOn;
 
-			for (string& sFilter : vStart)// = StartIterating; iterFilters != EndIterating; iterFilters++ )
+			for (std::string& sFilter : vStart)// = StartIterating; iterFilters != EndIterating; iterFilters++ )
 			{
 				auto found = iterS.find(sFilter.c_str());// iterFilters->c_str());//   itInputList->sToFilterOn[i]);
 
-				if (found != string::npos)
+				if (found != std::string::npos)
 				{
 					InputList.FilteredFileLines.push_back(iterS);
 				}
@@ -610,10 +625,11 @@ namespace ProcessPBSpews
 		}
 	}
 
-	bool GenerateFilteredSpewData::CollectUnfilteredFileLines(FILE * fSrc, ReadLineInterface &  ReadSourceLine, string & sErrorMsgRet) {
+	bool GenerateFilteredSpewData::CollectUnfilteredFileLines
+	                    (FILE * fSrc, ReadLineInterface &  ReadSourceLine, std::string & sErrorMsgRet) {
 		char cLineBuffer[100000];
 
-		ostringstream osErrorMsgRet;
+		std::ostringstream osErrorMsgRet;
 
 		osErrorMsgRet << "";
 
@@ -621,13 +637,9 @@ namespace ProcessPBSpews
 
 		unsigned int uiBufferSizeMax = uiMaxBufferSize;
 
-		auto bCollectionSuccess = true;
-
 		auto bEndOfFile = false;
 
 		auto pcLineBuffer = cLineBuffer;
-
-		auto bFileHeaderInfoRead = false;
 
 		while (!bEndOfFile)
 		{
@@ -640,7 +652,7 @@ namespace ProcessPBSpews
 			}
 			catch (...)
 			{
-				osErrorMsgRet << "Spew source incompatible with supported test file formats: " << GetLastError() << endl;
+				osErrorMsgRet << "Spew source incompatible with supported test file formats: " << std::endl; //GetLastError() << endl;
 
 				sErrorMsgRet = osErrorMsgRet.str();
 
@@ -657,13 +669,13 @@ namespace ProcessPBSpews
 				}
 				else if (uiNumberOfCharsRead == uiBufferSizeMax)
 				{
-					osErrorMsgRet << "Read Buffer Not Big Enough" << endl;
+					osErrorMsgRet << "Read Buffer Not Big Enough" << std::endl;
 
 					break;
 				}
 				else
 				{
-					osErrorMsgRet << "Error Reading File" << endl;
+					osErrorMsgRet << "Error Reading File" << std::endl;
 
 					break;
 				}
@@ -693,5 +705,22 @@ namespace ProcessPBSpews
 		}
 
 		return true;
+	}
+	void GenerateFilteredSpewData::AppendFileNameSuffix( std::string & sFileName, const std::string & sSuffix )
+	{
+		auto iFileExtPos = sFileName.find('.');
+
+		if (iFileExtPos < 0) {
+			sFileName += sSuffix;
+		}
+		else {
+			auto iNumberToErase = sFileName.length();
+
+			iNumberToErase -= iFileExtPos;
+
+			sFileName.erase(iFileExtPos, iNumberToErase);
+
+			sFileName += sSuffix;
+		}
 	}
 }
