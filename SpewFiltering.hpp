@@ -11,9 +11,9 @@
 
 namespace SpewFilteringSpace {
 
-constexpr size_t ERROR_IN_COMMAND_LINE     = 1;
-constexpr size_t SUCCESS                   = 0;
-constexpr size_t ERROR_UNHANDLED_EXCEPTION = 2;
+const size_t ERROR_IN_COMMAND_LINE     = 1;
+const size_t SUCCESS                   = 0;
+const size_t ERROR_UNHANDLED_EXCEPTION = 2;
 
 class SpewFiltering {
 public:
@@ -27,7 +27,8 @@ public:
 		ONLY_PHONE_FILTER,
 		ONLY_ACTION_SCRIPT_FILTER,
 		ONLY_HANDSFREE_FILTER,
-		ONLY_MAP_FILTER
+		ONLY_MAP_FILTER,
+		ONLY_MTP_FILTER
 	} SPEW_FILTER;
 
 

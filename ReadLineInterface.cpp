@@ -6,6 +6,7 @@
 #include <string.h>
 #include <boost/locale.hpp>
 #include <fstream>
+#include <system_error>
 
 //#include <codecvt>
 
@@ -53,7 +54,20 @@ namespace ProcessPBSpews {
     	"CMAPManager:"
     };
 
-    std::vector<std::string> MAPFilters = {	"CMAPManager:" };
+	std::vector<std::string> MTPFilters = { "MPCore:",
+		"MPMtpDevice:",
+		"AuxMedia:",
+		"CSMHandler:",
+		"CMedia:",
+		"CMtpDevice:",
+		"CMTPSourceClass:",
+		"MemMapFileURLStream:",
+		"CMTPBrowse:",
+		"AlbumArt:",
+		"Image:",
+		"MetadataCollectors:"
+	};
+	std::vector<std::string> MAPFilters = { "CMAPManager:" };
 
     std::vector<sFilterDescriptor> ProduceAllFilterDescriptor
     {
@@ -77,8 +91,12 @@ namespace ProcessPBSpews {
     	{
     			"_Filtered_Phone.txt",
     			BTPhoneFilters
-    	}
-    };
+    	},
+		{
+		    	"_Filtered_MTP.txt",
+				MTPFilters
+		}
+	};
 
     std::vector<sFilterDescriptor> ProducePhoneFilterDescriptor
     {
@@ -112,6 +130,15 @@ namespace ProcessPBSpews {
 			HFPFilters
 		}
 	};
+	std::vector<sFilterDescriptor> ProduceMTPFilterDescriptor
+	{
+		{
+			"_Filtered_MTP.txt",
+			MTPFilters
+		}
+	};
+
+
 	std::unique_ptr<ReadLineInterface> ReadLineInterfaceFactory::getReadLineInterface(std::string sFile, std::string & sErrorMsg)
 	{
 		TextFileType tft;
@@ -524,24 +551,28 @@ namespace ProcessPBSpews {
 		//
 		// Open the input file read it and fix lines terminate at '\r' only saving the output in a temporary file
 		//
-		FILE * fSrc = fopen(sInputFile.c_str(), "r");
+		FILE * fSrc;
+		
+		errno_t err = fopen_s(&fSrc, sInputFile.c_str(), "r");
 
-		if (!fSrc)
+		if (err)
 		{
-			osErrorMsgRet << "Error Opening Source File" << std::endl;//GetLastError() << endl;
+			osErrorMsgRet << "Error Opening Source File " << err << std::endl;
 
 			sErrorMsgRet = osErrorMsgRet.str();
 
 			return false;
 		}
 
-		FILE * fDest = fopen(sOutputFileUnfiltered.c_str(), "w+");
+		FILE * fDest;
+		
+		err = fopen_s(&fDest, sOutputFileUnfiltered.c_str(), "w+");
 
-		if (!fDest)
+		if (err)
 		{
 			fclose(fSrc);
 
-			osErrorMsgRet << "Error opening unfiltered output file for write" << std::endl;//GetLastError() << endl;
+			osErrorMsgRet << "Error opening unfiltered output file for write " << err << std::endl;
 
 			sErrorMsgRet = osErrorMsgRet.str();
 
@@ -579,9 +610,9 @@ namespace ProcessPBSpews {
 
 	        InputList.sFileNameToWrite = sOutputFileUnfiltered;
 
-			fDest = fopen(sOutputFileUnfiltered.c_str(), "w+");
+			err = fopen_s(&fDest, sOutputFileUnfiltered.c_str(), "w+");
 
-			if (!fDest)
+			if (err)
 			{
 				osErrorMsgRet << "Error opening destination file" << std::endl; //GetLastError() << endl;
 

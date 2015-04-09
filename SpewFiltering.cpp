@@ -39,8 +39,8 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 			  "                                h - HFP debug lines only\n"
 			  "                                s - Action Script messages only\n"
 			  "                                p - Bluetooth phone messages only\n";
-			  "                                m - MAP related phone messages only";
-
+  			  "                                m - MAP related phone messages only\n";
+			  "                                u - USB connected messages only";
 	const char * pcERROR_OptionOutOfOrder  = "ERROR: File to Filter needs to be the first option entered";
 	const char * pcERROR_InvalidFilterType = "ERROR: Invalid Filter type entered";
 	const char * pcERROR                   = "ERROR: ";
@@ -137,7 +137,7 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 
 		    		break;
 
-		    	case 'u':
+		    	case 'P':
 		    		sfp.sfFilterToApply = ONLY_PHONE_FILTER;
 
 		    		break;
@@ -152,7 +152,12 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 
 		    	    break;
 
-		    	default:
+				case 'u':
+					sfp.sfFilterToApply = ONLY_MTP_FILTER;
+
+					break;
+
+				default:
 		    		std::cerr << pcERROR_InvalidFilterType  << std::endl;
 
 		            rad::OptionPrinter::printStandardAppDesc(appName,
@@ -207,7 +212,7 @@ bool SpewFiltering::ProduceFilteredSpewFiles( SpewFilteringParams & sfp ) {
 
 	namespace pbs = ProcessPBSpews;
 
-	constexpr char * pcBlankInputLineError = "Error: Blank Input File Name Entered";
+	const char * pcBlankInputLineError = "Error: Blank Input File Name Entered";
 
 	if (sfp.sInputFile.empty()) {
 		std::cerr << pcBlankInputLineError << std::endl;
@@ -245,6 +250,9 @@ bool SpewFiltering::ProduceFilteredSpewFiles( SpewFilteringParams & sfp ) {
 		pfdToProcess = &pbs::ProduceHFPFilterDescriptor;
 
 		break;
+
+	case ONLY_MTP_FILTER:
+		pfdToProcess = &pbs::ProduceHFPFilterDescriptor;
 
 	default:
 		std::cerr << "Filter Type Not Handled" << std::endl;//GetLastError() << endl;
