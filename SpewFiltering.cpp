@@ -90,7 +90,13 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 	                                                     desc,
 	                                                     &positionalOptions);
 
-				return SUCCESS;
+				sfp.sfFilterToApply = NO_FILTER;
+
+				sfp.sInputFile = "";
+
+				sfp.sOutputFile = "";
+
+				return HELP_SUCCESSFUL;
 	        }
 
 		    // throws on error, so do after help in case there are any problems
@@ -189,21 +195,40 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 	        return ERROR_IN_COMMAND_LINE;
 	    }
 
-	    if ( vm.count(pcInputFileOptionID) ) {
-	    	sfp.sInputFile = vm[pcInputFileOptionID].as<std::string>();
+	    // Make this check even though the input file is required.
+		//
+		if ( vm.count(pcInputFileOptionID) ) {
+			sfp.sInputFile = vm[pcInputFileOptionID].as<std::string>();
+
+			if (!boost::filesystem::exists(sfp.sInputFile.c_str())) {
+				std::cerr << "Input File Not Found" << std::endl;
+
+				return ERROR_FILE_NOT_FOUND;
+			}
 	    }
 
 	    sfp.sOutputFile = sfp.sInputFile;
 
 	    if (vm.count(pcOutputFileOptionID)) {
-	    	sfp.sOutputFile = vm[pcOutputFileOptionID].as<std::string>();
-	    }
+			sfp.sOutputFile = vm[pcOutputFileOptionID].as<std::string>();
+			
+			boost::filesystem::path full(sfp.sOutputFile.c_str());
+
+			boost::filesystem::path folder = full.parent_path();
+
+			if (!boost::filesystem::exists(folder)) {
+				std::cerr << "Out File Path Not Found" << std::endl;
+
+				return ERROR_OUTPUT_FILE_PATH_NOT_FOUND;
+
+			}
+		}
 	}
 	catch(std::exception& e)
 	{
 		std::cerr << pcUnhandledErrorMsg << e.what() << pcAppExitErrorMsg << std::endl;
 
-	    return ERROR_UNHANDLED_EXCEPTION;
+		return ERROR_UNHANDLED_EXCPTN;
 	}
 
 	return SUCCESS;

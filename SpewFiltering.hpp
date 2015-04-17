@@ -11,9 +11,12 @@
 
 namespace SpewFilteringSpace {
 
-const size_t ERROR_IN_COMMAND_LINE     = 1;
-const size_t SUCCESS                   = 0;
-const size_t ERROR_UNHANDLED_EXCEPTION = 2;
+const size_t SUCCESS                          = 0;
+const size_t ERROR_IN_COMMAND_LINE            = 1;
+const size_t ERROR_UNHANDLED_EXCPTN           = 2;
+const size_t HELP_SUCCESSFUL                  = 3;
+const size_t ERROR_FILE_NOT_FOUND             = 4;
+const size_t ERROR_OUTPUT_FILE_PATH_NOT_FOUND = 5;
 
 class SpewFiltering {
 public:
@@ -28,7 +31,8 @@ public:
 		ONLY_ACTION_SCRIPT_FILTER,
 		ONLY_HANDSFREE_FILTER,
 		ONLY_MAP_FILTER,
-		ONLY_MTP_FILTER
+		ONLY_MTP_FILTER,
+		NO_FILTER
 	} SPEW_FILTER;
 
 
