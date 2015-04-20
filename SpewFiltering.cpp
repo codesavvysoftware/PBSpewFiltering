@@ -117,7 +117,9 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 		    if (vm.count(pcTypeOfFilterOptionID)) {
 		    	std::string s = vm[pcTypeOfFilterOptionID].as<std::string>();
 
-		    	if ( 1 != s.length()) {
+				s = TrimWhiteSpace(s);
+
+				if (1 != s.length()) {
 			    	std::cerr << pcERROR_InvalidFilterType  << std::endl;
 
 		            rad::OptionPrinter::printStandardAppDesc(appName,
@@ -200,11 +202,21 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 		if ( vm.count(pcInputFileOptionID) ) {
 			sfp.sInputFile = vm[pcInputFileOptionID].as<std::string>();
 
-			if (!boost::filesystem::exists(sfp.sInputFile.c_str())) {
-				std::cerr << "Input File Not Found" << std::endl;
+			sfp.sInputFile = TrimWhiteSpace(sfp.sInputFile);
 
-				return ERROR_FILE_NOT_FOUND;
+			boost::filesystem::path full_path = boost::filesystem::absolute(sfp.sInputFile);
+
+			try {
+				full_path = boost::filesystem::canonical(full_path);
 			}
+			catch (std::exception& e) {
+				std::cerr << pcERROR << e.what() << std::endl << std::endl;
+
+				return ERROR_FILE_WAS_NOT_FOUND;
+			}
+
+			sfp.sInputFile = full_path.string();
+
 	    }
 
 	    sfp.sOutputFile = sfp.sInputFile;
@@ -212,16 +224,22 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 	    if (vm.count(pcOutputFileOptionID)) {
 			sfp.sOutputFile = vm[pcOutputFileOptionID].as<std::string>();
 			
-			boost::filesystem::path full(sfp.sOutputFile.c_str());
+			sfp.sOutputFile = TrimWhiteSpace(sfp.sOutputFile);
 
-			boost::filesystem::path folder = full.parent_path();
+			boost::filesystem::path full_path = boost::filesystem::absolute(sfp.sOutputFile);
 
-			if (!boost::filesystem::exists(folder)) {
-				std::cerr << "Out File Path Not Found" << std::endl;
+			boost::filesystem::path folder = full_path.parent_path();
+
+			try {
+				full_path = boost::filesystem::canonical(full_path);
+			}
+			catch (std::exception& e) {
+				std::cerr << pcERROR << e.what() << std::endl << std::endl;
 
 				return ERROR_OUTPUT_FILE_PATH_NOT_FOUND;
-
 			}
+
+			sfp.sOutputFile = full_path.string();
 		}
 	}
 	catch(std::exception& e)
@@ -311,6 +329,17 @@ bool SpewFiltering::ProduceFilteredSpewFiles( SpewFilteringParams & sfp ) {
 	return true;
 }
 
+std::string SpewFiltering::TrimWhiteSpace(const std::string & str, const std::string & whitespace) {
+	const auto strBegin = str.find_first_not_of(whitespace);
+
+	if (strBegin == std::string::npos) return "";
+
+	const auto strEnd = str.find_last_not_of(whitespace);
+
+	const auto strRange = strEnd - strBegin + 1;
+
+	return str.substr(strBegin, strRange);
+}
 }
 
 

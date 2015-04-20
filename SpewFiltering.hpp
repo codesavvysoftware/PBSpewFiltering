@@ -8,6 +8,7 @@
 #ifndef SPEWFILTERING_HPP_
 #define SPEWFILTERING_HPP_
 #include <string>
+//#include "boost/filesystem.hpp"
 
 namespace SpewFilteringSpace {
 
@@ -15,7 +16,7 @@ const size_t SUCCESS                          = 0;
 const size_t ERROR_IN_COMMAND_LINE            = 1;
 const size_t ERROR_UNHANDLED_EXCPTN           = 2;
 const size_t HELP_SUCCESSFUL                  = 3;
-const size_t ERROR_FILE_NOT_FOUND             = 4;
+const size_t ERROR_FILE_WAS_NOT_FOUND         = 4;
 const size_t ERROR_OUTPUT_FILE_PATH_NOT_FOUND = 5;
 
 class SpewFiltering {
@@ -38,7 +39,9 @@ public:
 
 	typedef struct {
 		std::string sInputFile;
+		//boost::filesystem::path pthInput;
 		std::string sOutputFile;
+		//boost::filesystem::path output;
 		SPEW_FILTER sfFilterToApply;
 	} SpewFilteringParams;
 
@@ -47,6 +50,10 @@ public:
 	bool ProduceFilteredSpewFiles( SpewFilteringParams & sfp );
 
 	bool ApplySpewFiltering( SpewFilteringParams & sfp );
+
+private:
+	std::string SpewFiltering::TrimWhiteSpace(const std::string & str, const std::string & whitespace = " \t");
+
 };
 }
 
