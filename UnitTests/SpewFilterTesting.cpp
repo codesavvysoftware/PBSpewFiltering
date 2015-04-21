@@ -192,6 +192,7 @@ struct SpewFilter_fixture
 				}
 			}
 		}
+
 	}
 };
 
