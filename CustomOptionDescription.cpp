@@ -1,4 +1,4 @@
-/
+
 #include "CustomOptionDescription.hpp"
 
 #include "boost/algorithm/string/erase.hpp"
