@@ -293,6 +293,94 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_Whitespace)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
+SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_NoKey_No_Whitespace)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = SandoxFolderPath;
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_No_Whitespace)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = SandoxFolderPath;
+
+	sOutputOptionID = "-i ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_NoKey_Whitespace)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = SandoxFolderPath;
+
+	sInputFileLeadingWhiteSpace = "\t    \t\t    ";
+
+	sInputFileTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_Whitespace)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = SandoxFolderPath;
+
+	sOutputOptionID = "-i ";
+
+	sInputFileLeadingWhiteSpace = "            \t    \t\t    ";
+
+	sInputFileTrailingWhiteSpace = "\t\t\t\t\t\t         \t";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
 SPEW_FILTER_TEST_CASE(NotExistInptFile_RelPath_NoKey_No_Whitespace)
 {
 	ClearArgvArgC();
