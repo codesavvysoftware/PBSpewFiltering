@@ -366,7 +366,7 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_Whitespace)
 
 	sOutputOptionID = "-i ";
 
-	sInputFileLeadingWhiteSpace = "            \t    \t\t    ";
+	sInputFileLeadingWhiteSpace = "    \t    \t\t    ";
 
 	sInputFileTrailingWhiteSpace = "\t\t\t\t\t\t         \t";
 
