@@ -41,13 +41,14 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 			  "                                p - Bluetooth phone messages only\n";
   			  "                                m - MAP related phone messages only\n";
 			  "                                u - USB connected messages only";
+
 	const char * pcERROR_OptionOutOfOrder  = "ERROR: File to Filter needs to be the first option entered";
 	const char * pcERROR_InvalidFilterType = "ERROR: Invalid Filter type entered";
 	const char * pcERROR                   = "ERROR: ";
 
 	const char * pcInputFileOptionID    = "-i";
 	const char * pcOutputFileOptionID   = "-o";
-	const char * pcTypeOfFilterOptionID = "TypeOfFilter";
+	const char * pcTypeOfFilterOptionID = "--TypeOfFilter,-t";
 
 	const char * pcInfileEnteredPrompt  = "Input File Entered: ";
 	const char * pcOutfileEnteredPrompt = "Output File Entered: ";

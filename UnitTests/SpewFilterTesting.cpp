@@ -380,8 +380,352 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_Whitespace)
 
 	BOOST_CHECK(Configured == SUCCESS);
 }
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceFullFiltSelAll)
+{
+	ClearArgvArgC();
 
-SPEW_FILTER_TEST_CASE(NotExistInptFile_RelPath_NoKey_No_Whitespace)
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "a";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelEvery)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "e";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceFullFiltSelHFP)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "h";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelActionScript)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "s";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceFullFiltSelBT)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "p";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelMap)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "m";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelUSB)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "u";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceAbrvFiltSelAll)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "a";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelEvery)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "e";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceAbrvFiltSelHFP)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "h";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelActionScript)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "s";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceAbrvFiltSelBT)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "p";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelMap)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "m";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelUSB)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "u";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}SPEW_FILTER_TEST_CASE(NotExistInptFile_RelPath_NoKey_No_Whitespace)
 {
 	ClearArgvArgC();
 

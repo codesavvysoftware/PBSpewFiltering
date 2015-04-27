@@ -1,6 +1,11 @@
 // OneLinePer.cpp : Defines the entry point for the console application.
 //
+template <typename T, template CheckingPolicy>
+SmartyPointer :public CheckingPolicy < T > {
+template <typename T1, template <typename> class CP1>
+SmartyPointer(const SmartyPtr<T1, CP1>& other) : pointee_(other.pointee_), CheckingPolicy<T1>(other){ ... }
 
+};
 #include "stdafx.h"
 #include <iostream>
 #include <windows.h>
