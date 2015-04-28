@@ -232,7 +232,7 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_No_Whitespace)
 
 	sInputFileParent = RelFolder;
 
-	sOutputOptionID = "-i ";
+	sInputOptionID = "-i ";
 
 	ConfigureArgCArgV();
 
@@ -276,7 +276,7 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_Whitespace)
 
 	sInputFileParent = RelFolder;
 
-	sOutputOptionID = "-i ";
+	sInputOptionID = "-i ";
 
 	sInputFileLeadingWhiteSpace = "            \t    \t\t    ";
 
@@ -320,7 +320,7 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_No_Whitespace)
 
 	sInputFileParent = SandoxFolderPath;
 
-	sOutputOptionID = "-i ";
+	sInputOptionID = "-i ";
 
 	ConfigureArgCArgV();
 
@@ -364,7 +364,7 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_Whitespace)
 
 	sInputFileParent = SandoxFolderPath;
 
-	sOutputOptionID = "-i ";
+	sInputOptionID = "-i ";
 
 	sInputFileLeadingWhiteSpace = "    \t    \t\t    ";
 
@@ -405,13 +405,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceFullFiltSelAll)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelEvery)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspace_FullFiltSelEvery)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -430,13 +432,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelEvery)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceFullFiltSelHFP)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspaceFullFiltSelHFP)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -455,13 +459,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceFullFiltSelHFP)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelActionScript)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspace_FullFiltSelActionScript)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -480,13 +486,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelActionScript)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceFullFiltSelBT)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspaceFullFiltSelBT)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -505,13 +513,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceFullFiltSelBT)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelMap)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspace_FullFiltSelMap)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -529,13 +539,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelMap)
 
 	BOOST_CHECK(Configured == SUCCESS);
 }
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelUSB)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspace_FullFiltSelUSB)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -553,13 +565,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_FullFiltSelUSB)
 
 	BOOST_CHECK(Configured == SUCCESS);
 }
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceAbrvFiltSelAll)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspaceAbrvFiltSelAll)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -578,13 +592,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceAbrvFiltSelAll)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelEvery)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspace_AbrvFiltSelEvery)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -603,13 +619,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelEvery)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceAbrvFiltSelHFP)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspaceAbrvFiltSelHFP)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -628,13 +646,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceAbrvFiltSelHFP)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelActionScript)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspace_AbrvFiltSelActionScript)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -653,13 +673,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelActionScript)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceAbrvFiltSelBT)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspaceAbrvFiltSelBT)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -678,13 +700,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspaceAbrvFiltSelBT)
 	BOOST_CHECK(Configured == SUCCESS);
 }
 
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelMap)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspace_AbrvFiltSelMap)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -702,13 +726,15 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelMap)
 
 	BOOST_CHECK(Configured == SUCCESS);
 }
-SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelUSB)
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoWspace_AbrvFiltSelUSB)
 {
 	ClearArgvArgC();
 
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
@@ -725,7 +751,382 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoWspace_AbrvFiltSelUSB)
 	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
 
 	BOOST_CHECK(Configured == SUCCESS);
-}SPEW_FILTER_TEST_CASE(NotExistInptFile_RelPath_NoKey_No_Whitespace)
+}
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltAll)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "a";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltEvery)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "e";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltHFP)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "h";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltAcnScrpt)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "s";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltBT)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "p";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltMap)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "m";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltUSB)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "u";
+
+	sFilterOptionID = "--TypeOfFilter=";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltAll)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "a";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltEvery)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "e";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltHFP)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "h";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltActnScrpt)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "s";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltBT)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "p";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltMap)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "m";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltUSB)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	sInputOptionID = "-i ";
+
+	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
+
+	sFilterType = "u";
+
+	sFilterOptionID = "-t ";
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+SPEW_FILTER_TEST_CASE(NotExistInptFile_RelPath_NoKey_No_Whitespace)
 {
 	ClearArgvArgC();
 
