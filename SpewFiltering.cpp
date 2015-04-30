@@ -231,8 +231,12 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 
 			boost::filesystem::path folder = full_path.parent_path();
 
+			boost::filesystem::path OutputFileNamePrefix = full_path.filename();
+
+			boost::filesystem::path full_parent_path;
+
 			try {
-				full_path = boost::filesystem::canonical(full_path);
+				full_parent_path = boost::filesystem::canonical(folder);
 			}
 			catch (std::exception& e) {
 				std::cerr << pcERROR << e.what() << std::endl << std::endl;
@@ -240,7 +244,7 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 				return ERROR_OUTPUT_FILE_PATH_NOT_FOUND;
 			}
 
-			sfp.sOutputFile = full_path.string();
+			sfp.sOutputFile = full_parent_path.string() + "\\" + OutputFileNamePrefix.string();
 		}
 	}
 	catch(std::exception& e)

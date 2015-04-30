@@ -15,10 +15,19 @@
 
 static std::string UnicodeSource = "UnicodeTestSource_01.txt";
 static std::string AnsiSource = "AnsiTestSource_01.txt";
-
+static std::string sTestOutputFileName = "A Test for Separate Output Files";
 static std::string RelFolder = "..\\Folder SandBox\\";
 static std::string SourceFolderPath = "C:\\Spew Filter Test\\Test File Source\\";
 static std::string SandoxFolderPath = "C:\\Spew Filter Test\\Folder SandBox\\";
+static std::string SandboxOutputFolderPath = "C:\\Spew Filter Test\\Output Files Can Go Here\\";
+static std::string RelOutputFolder = "..\\Output Files Can Go Here\\";
+static std::string sInputFileOption = "-i ";
+static std::string sOutputFileOption = "-o ";
+static std::string sFilterAbvOption = "-t ";
+static std::string sFilterFullOption = "--TypeOfFilter=";
+static std::string sWhiteSpace_Leading = " \t\t  \t\t   \t\t\t   \t  \t    \t\t\t    ";
+static std::string sWhiteSpace_Trailing = "\t\t\t      \t \t \t \t \t   ";
+
 using namespace boost::unit_test;
 
 int main(int  argc,
@@ -232,7 +241,7 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_No_Whitespace)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	ConfigureArgCArgV();
 
@@ -253,9 +262,9 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_Whitespace)
 
 	sInputFileParent = RelFolder;
 
-	sInputFileLeadingWhiteSpace = "\t    \t\t    ";
+	sInputFileLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sInputFileTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sInputFileTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -276,11 +285,11 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_Whitespace)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
-	sInputFileLeadingWhiteSpace = "            \t    \t\t    ";
+	sInputFileLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sInputFileTrailingWhiteSpace = "\t\t\t\t\t\t         \t";
+	sInputFileTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -320,7 +329,7 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_No_Whitespace)
 
 	sInputFileParent = SandoxFolderPath;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	ConfigureArgCArgV();
 
@@ -341,9 +350,10 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_NoKey_Whitespace)
 
 	sInputFileParent = SandoxFolderPath;
 
-	sInputFileLeadingWhiteSpace = "\t    \t\t    ";
+	// mix them up once in a while :)
+	sInputFileLeadingWhiteSpace = sWhiteSpace_Trailing;
 
-	sInputFileTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sInputFileTrailingWhiteSpace = sWhiteSpace_Leading;
 
 	ConfigureArgCArgV();
 
@@ -364,11 +374,11 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_Whitespace)
 
 	sInputFileParent = SandoxFolderPath;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
-	sInputFileLeadingWhiteSpace = "    \t    \t\t    ";
+	sInputFileLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sInputFileTrailingWhiteSpace = "\t\t\t\t\t\t         \t";
+	sInputFileTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -392,7 +402,7 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoW_FFiltAll)
 
 	sFilterType = "a";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
 	ConfigureArgCArgV();
 
@@ -413,13 +423,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltEvery)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "e";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
 	ConfigureArgCArgV();
 
@@ -440,13 +450,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltHFP)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "h";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
 	ConfigureArgCArgV();
 
@@ -467,13 +477,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltAS)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "s";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
 	ConfigureArgCArgV();
 
@@ -494,13 +504,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltBT)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "p";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
 	ConfigureArgCArgV();
 
@@ -521,13 +531,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltMap)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "m";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
 	ConfigureArgCArgV();
 
@@ -547,13 +557,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_FFiltUSB)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "u";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
 	ConfigureArgCArgV();
 
@@ -573,13 +583,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltAll)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "a";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
 	ConfigureArgCArgV();
 
@@ -600,13 +610,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltEvery)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "e";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
 	ConfigureArgCArgV();
 
@@ -627,13 +637,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltHFP)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "h";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
 	ConfigureArgCArgV();
 
@@ -654,13 +664,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltAS)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "s";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
 	ConfigureArgCArgV();
 
@@ -681,13 +691,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltBT)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "p";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
 	ConfigureArgCArgV();
 
@@ -708,13 +718,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltMap)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "m";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
 	ConfigureArgCArgV();
 
@@ -734,13 +744,13 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_NoW_AFiltUSB)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "u";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
 	ConfigureArgCArgV();
 
@@ -760,17 +770,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_FFiltAll)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "a";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -791,17 +801,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_FFiltEvery)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "e";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -822,17 +832,18 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_FFiltHFP)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "h";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	// mixing it up
+	sOptionLeadingWhiteSpace = sWhiteSpace_Trailing;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Leading;
 
 	ConfigureArgCArgV();
 
@@ -853,17 +864,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_FFiltAcnScrpt)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "s";
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
 	ConfigureArgCArgV();
 
@@ -884,17 +895,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_FFiltBT)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "p";
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
 	ConfigureArgCArgV();
 
@@ -915,17 +926,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_FFiltMap)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "m";
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
 	ConfigureArgCArgV();
 
@@ -945,17 +956,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_FFiltUSB)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "u";
 
-	sFilterOptionID = "--TypeOfFilter=";
+	sFilterOptionID = sFilterFullOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -975,17 +986,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_AFiltAll)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "a";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -1006,17 +1017,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_AFiltEvery)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "e";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -1037,17 +1048,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_AFiltHFP)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "h";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -1068,17 +1079,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_AFiltActnScrpt)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "s";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -1099,17 +1110,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_AFiltBT)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "p";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -1130,17 +1141,17 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_AFiltMap)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "m";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
 
 	ConfigureArgCArgV();
 
@@ -1160,17 +1171,43 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_AFiltUSB)
 
 	sInputFileParent = RelFolder;
 
-	sInputOptionID = "-i ";
+	sInputOptionID = sInputFileOption;
 
 	iArgumentNumberOfFilterOption = iArgumentNumberOfInputFile + 1;
 
 	sFilterType = "u";
 
-	sFilterOptionID = "-t ";
+	sFilterOptionID = sFilterAbvOption;
 
-	sOptionLeadingWhiteSpace = "\t    \t\t    ";
+	sOptionLeadingWhiteSpace = sWhiteSpace_Leading;
 
-	sOptionTrailingWhiteSpace = "    \t\t\t\t\t\t         ";
+	sOptionTrailingWhiteSpace = sWhiteSpace_Trailing;
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoW_Oabs)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfOutputFile = iArgumentNumberOfInputFile + 1;
+
+	sOutputFileName = sTestOutputFileName;
+	
+	sOutputOptionID = sOutputFileOption;
+	
+	sOutputFileParent = SandboxOutputFolderPath;
 
 	ConfigureArgCArgV();
 
@@ -1215,7 +1252,7 @@ SPEW_FILTER_TEST_CASE(NotExistOutptFile_RelPath_NoKey_No_Whitespace)
 
 	sOutputFileParent = "";
 
-	sOutputOptionID = "-o ";
+	sOutputOptionID = sOutputFileOption;
 
 	ConfigureArgCArgV();
 
