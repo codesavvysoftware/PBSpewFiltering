@@ -11,6 +11,7 @@
 #include "spewfiltering.hpp"
 #include <direct.h>
 #include <boost/filesystem.hpp>
+#include <fstream>
 
 
 static std::string UnicodeSource = "UnicodeTestSource_01.txt";
@@ -29,6 +30,35 @@ static std::string sWhiteSpace_Leading = " \t\t  \t\t   \t\t\t   \t  \t    \t\t\
 static std::string sWhiteSpace_Trailing = "\t\t\t      \t \t \t \t \t   ";
 
 using namespace boost::unit_test;
+struct LogToFile
+{
+	LogToFile()
+	{
+		std::string logFileName(boost::unit_test::framework::master_test_suite().p_name);
+		logFileName.append(".xml");
+		logFile.open(logFileName.c_str());
+		boost::unit_test::unit_test_log.set_stream(logFile);
+	}
+	~LogToFile()
+	{
+		boost::unit_test::unit_test_log.test_finish();
+		logFile.close();
+		boost::unit_test::unit_test_log.set_stream(std::cout);
+	}
+	std::ofstream logFile;
+};
+
+BOOST_GLOBAL_FIXTURE(LogToFile);
+/*struct MyConfig {
+	MyConfig() : test_log("example.log")  { boost::unit_test::unit_test_log.set_stream(test_log); }
+	~MyConfig()                             { boost::unit_test::unit_test_log.set_stream(std::cout); }
+
+	std::ofstream test_log;
+};
+
+//____________________________________________________________________________//
+
+BOOST_GLOBAL_FIXTURE(MyConfig); */
 
 int main(int  argc,
 	char **  argv
