@@ -214,6 +214,7 @@ BOOST_AUTO_TEST_SUITE(test_SpewFilter);
 
 BOOST_AUTO_TEST_SUITE(test_SpewFilter_InputFileSel);
 
+// Testing valid input file selections
 SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_No_Whitespace)
 {
 	ClearArgvArgC();
@@ -390,6 +391,9 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_Whitespace)
 
 	BOOST_CHECK(Configured == SUCCESS);
 }
+
+
+// Testing valid filter option selections
 SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoW_FFiltAll)
 {
 	ClearArgvArgC();
@@ -1193,6 +1197,8 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_Key_W_AFiltUSB)
 
 	BOOST_CHECK(Configured == SUCCESS);
 }
+
+// Testing valid output file selections
 SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoW_Oabs)
 {
 	ClearArgvArgC();
@@ -1219,6 +1225,94 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoW_Oabs)
 
 	BOOST_CHECK(Configured == SUCCESS);
 }
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoW_Orel)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfOutputFile = iArgumentNumberOfInputFile + 1;
+
+	sOutputFileName = sTestOutputFileName;
+
+	sOutputOptionID = sOutputFileOption;
+
+	sOutputFileParent = RelOutputFolder;
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_W_Oabs)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfOutputFile = iArgumentNumberOfInputFile + 1;
+
+	sOutputFileName = sTestOutputFileName;
+
+	sOutputOptionID = sOutputFileOption;
+
+	sOutputFileParent = SandboxOutputFolderPath;
+
+	sOutputFileLeadingWhiteSpace = sWhiteSpace_Leading;
+
+	sOutputFileTrailingWhiteSpace = sWhiteSpace_Trailing;
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_W_Orel)
+{
+	ClearArgvArgC();
+
+	sInputFileName = UnicodeSource;
+
+	sInputFileParent = RelFolder;
+
+	iArgumentNumberOfOutputFile = iArgumentNumberOfInputFile + 1;
+
+	sOutputFileName = sTestOutputFileName;
+
+	sOutputOptionID = sOutputFileOption;
+
+	sOutputFileParent = RelOutputFolder;
+
+	sOutputFileLeadingWhiteSpace = sWhiteSpace_Leading;
+
+	sOutputFileTrailingWhiteSpace = sWhiteSpace_Trailing;
+
+	ConfigureArgCArgV();
+
+	SpewFiltering::SpewFilteringParams FilterParams;
+
+	char ** pc = &ArguementList[0];
+
+	std::size_t Configured = sfFiltering.ConfigureFilteringParams(iNumberOfArgs, pc, FilterParams);
+
+	BOOST_CHECK(Configured == SUCCESS);
+}
+
+
 SPEW_FILTER_TEST_CASE(NotExistInptFile_RelPath_NoKey_No_Whitespace)
 {
 	ClearArgvArgC();
