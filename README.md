@@ -26,7 +26,7 @@ Future activites that I intend to do:
   1. Add unit tests incrementally.  I don't have very many but I have the infracture to the point where I can I can
     add to them easily.  I intend to try to add one per day for a while anyway.
     
-  2.  Provide the means to rite the results of unit tests to a file.  
+  2.  Provide the means to write the results of unit tests to a file (besides just redirecting stderr and stdout from the command line which is in option). 
   
   3.  "Pretty up" the unit test output.
   
