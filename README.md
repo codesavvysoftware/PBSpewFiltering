@@ -26,9 +26,9 @@ Future activites that I intend to do:
   1. Add unit tests incrementally.  I don't have very many but I have the infracture to the point where I can I can
     add to them easily.  I intend to try to add one per day for a while anyway.
     
-  2.  Provide the means to write the results of unit tests to a file (besides just redirecting stderr and stdout from the command line which is in option). 
+  2.  Provide the means to write the results of unit tests to a file (besides just redirecting stderr and stdout from the command line which is in option). Finished, writes the results to an XML file that is supposed to be compatible with with xUnit a Jenkins plugin. 
   
-  3.  "Pretty up" the unit test output.
+  3.  "Pretty up" the unit test output.  Not Needed.
   
   4.  Add Visual Studio project file for making the application and the unit tests.
   
