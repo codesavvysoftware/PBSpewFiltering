@@ -1,3 +1,11 @@
+//============================================================================
+// Name        : SpewFilterTesting.cpp
+// Author      : 
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
 // SpewFilterTesting.cpp : Defines the entry point for the console application.
 //
 #define BOOST_TEST_ALTERNATIVE_INIT_API
@@ -5,23 +13,35 @@
 //#include "stdafx.h"
 #define BOOST_TEST_MODULE SpewFilter_UI
 //#define BOOST_AUTO_TEST_MAIN
-#define  BOOST_TEST_NO_MAIN 
+#define  BOOST_TEST_NO_MAIN
 
 #include <boost/test/included/unit_test.hpp>
-#include "spewfiltering.hpp"
-#include <direct.h>
+#include "SpewFiltering.hpp"
+//#include <direct.h>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS //#include <boost/filesystem.hpp>
 #include <fstream>
 
 
 static std::string UnicodeSource = "UnicodeTestSource_01.txt";
 static std::string AnsiSource = "AnsiTestSource_01.txt";
+#ifdef GCC
+#include <errno.h>
+static std::string sTestOutputFileName = "ATestforSeparateOutputFiles";
+static std::string RelFolder = "..//Folder_Sandbox//";
+static std::string SourceFolderPath = "//home//tomh//SpewFilterTesting//Test_File_Source//";
+static std::string SandboxFolderPath = "//home//tomh//SpewFilterTesting//Folder_Sandbox//";
+static std::string SandboxOutputFolderPath = "//home//tomh//SpewFilterTesting//Output_Files_Go_Here//";
+static std::string RelOutputFolder = "..\\Output_Files_Go_Here\\";
+#else
 static std::string sTestOutputFileName = "A Test for Separate Output Files";
 static std::string RelFolder = "..\\Folder SandBox\\";
 static std::string SourceFolderPath = "C:\\Spew Filter Test\\Test File Source\\";
-static std::string SandoxFolderPath = "C:\\Spew Filter Test\\Folder SandBox\\";
+static std::string SandboxFolderPath = "C:\\Spew Filter Test\\Folder SandBox\\";
 static std::string SandboxOutputFolderPath = "C:\\Spew Filter Test\\Output Files Can Go Here\\";
 static std::string RelOutputFolder = "..\\Output Files Can Go Here\\";
+#endif
 static std::string sInputFileOption = "-i ";
 static std::string sOutputFileOption = "-o ";
 static std::string sFilterAbvOption = "-t ";
@@ -61,7 +81,7 @@ BOOST_GLOBAL_FIXTURE(LogToFile);
 BOOST_GLOBAL_FIXTURE(MyConfig); */
 
 int main(int  argc,
-	char **  argv
+	     char **  argv
 	)
 {
 	char * argv0 = argv[0];
@@ -190,14 +210,16 @@ struct SpewFilter_fixture
 
 		for (int i = 0; i < 50; i++) ArguementList[i] = nullptr;
 
+		int iNameLen = strlen(SandboxFolderPath.c_str());
 		// Clear the Sandbox for previous test result files
-		auto iDirChanged = _chdir(SandoxFolderPath.c_str());
+		auto iDirChanged = chdir(SandboxFolderPath.c_str());
 
 		if (iDirChanged >= 0) {
 			boost::filesystem::path full_path(boost::filesystem::current_path());
 
-			boost::filesystem::directory_iterator it(full_path), eod;
+			boost::filesystem::directory_iterator it(full_path), end;
 
+			//directory_iterator end ;
 			for (boost::filesystem::path const &p : it)
 			{
 				if (is_regular_file(p))
@@ -206,20 +228,24 @@ struct SpewFilter_fixture
 				}
 			}
 		}
-		
+
 		// Put the test files in the Sandbox
-		iDirChanged = _chdir(SourceFolderPath.c_str());
+		iDirChanged = chdir(SourceFolderPath.c_str());
 
 		if (iDirChanged >= 0) {
 			boost::filesystem::path full_path(boost::filesystem::current_path());
 
-			boost::filesystem::directory_iterator it(full_path), eod;
+			boost::filesystem::directory_iterator it(full_path), end;
 
+			//directory_iterator end ;
+			//for( it ; it != end ; ++it )
 			for (boost::filesystem::path const &sourcePath : it)
 			{
+				//boost::filesystem::path sourcePath = *it;
+
 				if (is_regular_file(sourcePath))
 				{
-					std::string dest = SandoxFolderPath;// +sourcePath.filename.string();
+					std::string dest = SandboxFolderPath;// +sourcePath.filename.string();
 
 					boost::filesystem::path sourceName = sourcePath.filename();
 
@@ -248,11 +274,11 @@ BOOST_AUTO_TEST_SUITE(test_SpewFilter_InputFileSel);
 SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_No_Whitespace)
 {
 	ClearArgvArgC();
-	
+
 	sInputFileName = UnicodeSource;
 
 	sInputFileParent = RelFolder;
-	
+
 	ConfigureArgCArgV();
 
 	SpewFiltering::SpewFilteringParams FilterParams;
@@ -339,7 +365,7 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_NoKey_No_Whitespace)
 
 	sInputFileName = UnicodeSource;
 
-	sInputFileParent = SandoxFolderPath;
+	sInputFileParent = SandboxFolderPath;
 
 	ConfigureArgCArgV();
 
@@ -358,7 +384,7 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_No_Whitespace)
 
 	sInputFileName = UnicodeSource;
 
-	sInputFileParent = SandoxFolderPath;
+	sInputFileParent = SandboxFolderPath;
 
 	sInputOptionID = sInputFileOption;
 
@@ -379,7 +405,7 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_NoKey_Whitespace)
 
 	sInputFileName = UnicodeSource;
 
-	sInputFileParent = SandoxFolderPath;
+	sInputFileParent = SandboxFolderPath;
 
 	// mix them up once in a while :)
 	sInputFileLeadingWhiteSpace = sWhiteSpace_Trailing;
@@ -403,7 +429,7 @@ SPEW_FILTER_TEST_CASE(InptFile_AbsltPath_Key_Whitespace)
 
 	sInputFileName = UnicodeSource;
 
-	sInputFileParent = SandoxFolderPath;
+	sInputFileParent = SandboxFolderPath;
 
 	sInputOptionID = sInputFileOption;
 
@@ -1240,9 +1266,9 @@ SPEW_FILTER_TEST_CASE(InptFile_RelPath_NoKey_NoW_Oabs)
 	iArgumentNumberOfOutputFile = iArgumentNumberOfInputFile + 1;
 
 	sOutputFileName = sTestOutputFileName;
-	
+
 	sOutputOptionID = sOutputFileOption;
-	
+
 	sOutputFileParent = SandboxOutputFolderPath;
 
 	ConfigureArgCArgV();

@@ -1,13 +1,16 @@
 #include "ReadLineInterface.h"
 #include <iostream>
+#include <fstream>
 #include <locale>
 #include <sstream>
 #include <string>
 #include <string.h>
 #include <boost/locale.hpp>
-#include <fstream>
 #include <system_error>
-
+#ifdef GCC
+#include <errno.h>
+#include <stdio.h>
+#endif
 //#include <codecvt>
 
 
@@ -138,7 +141,6 @@ namespace ProcessPBSpews {
 		}
 	};
 
-
 	std::unique_ptr<ReadLineInterface> ReadLineInterfaceFactory::getReadLineInterface(std::string sFile, std::string & sErrorMsg)
 	{
 		TextFileType tft;
@@ -147,18 +149,19 @@ namespace ProcessPBSpews {
 
 		sErrorMsg = "";
 
-		FILE * fSrc = fopen(sFile.c_str(), "r");
+		//FILE * fSrc;
 
-		if (!fSrc)
-		{
-			sErrorMsg = "Error Opening Source File";
+		std::ifstream fSrc(const_cast<char *>(sFile.c_str()),std::fstream::binary);
+
+		if (!fSrc.is_open()) {
+			sErrorMsg = "Error Opening Source File.  Error";
 
 			return std::unique_ptr<ReadLineInterface>(nullptr);
 		}
 
 		bool bFileTypeWasFetched = FetchTextFileType(fSrc, tft, s);
 
-		fclose(fSrc);
+		fSrc.close();
 
 		if (bFileTypeWasFetched) {
 			switch (tft)
@@ -188,28 +191,22 @@ namespace ProcessPBSpews {
 		return std::unique_ptr<ReadLineInterface>(nullptr);
 	}
 
-	bool ReadLineInterfaceFactory::FetchTextFileType(FILE * fSrc, TextFileType & tftFileType, std::string & sErrorMsgRet) {
+	bool ReadLineInterfaceFactory::FetchTextFileType(std::ifstream & fSrc, TextFileType & tftFileType, std::string & sErrorMsgRet) {
 		if (!fSrc) return false;
 
 		std::ostringstream osErrorMsgRet;
 
 		osErrorMsgRet << "";
 
-		long lCurrentStreamPos = ftell(fSrc);
+		long lCurrentStreamPos = fSrc.tellg();
 
-		if (fseek(fSrc, 0, SEEK_SET))
-		{
-			return false;
-		}
+		if ( !GetFilePtrPos(fSrc, lCurrentStreamPos) ) return false;
+
+		if ( !SetFilePtrPos(fSrc, 0)) return false;
 
 		char c[20];
 
-		int result = fread(c, 1, 1, fSrc);
-
-		if (result != 1)
-		{
-			return false;
-		}
+		if (!ReadStreamData(fSrc, c, sizeof(char))) return false;
 
 		unsigned char uc = c[0];
 
@@ -221,7 +218,7 @@ namespace ProcessPBSpews {
 			  EF BB BF 	    UTF - 8 */
 		if (uc == 0)
 		{
-			fseek(fSrc, lCurrentStreamPos, SEEK_SET);
+			SetFilePtrPos(fSrc, lCurrentStreamPos);
 
 			tftFileType = UTF32BigEndian;
 
@@ -230,7 +227,7 @@ namespace ProcessPBSpews {
 
 		if (uc == 0xFE)
 		{
-			fseek(fSrc, lCurrentStreamPos, SEEK_SET);
+			SetFilePtrPos(fSrc, lCurrentStreamPos);
 
 			tftFileType = UTF16BigEndian;
 
@@ -239,7 +236,7 @@ namespace ProcessPBSpews {
 
 		if (uc == 0xEF)
 		{
-			fseek(fSrc, lCurrentStreamPos, SEEK_SET);
+			SetFilePtrPos(fSrc, lCurrentStreamPos);
 
 			tftFileType = UTF8;
 
@@ -248,17 +245,9 @@ namespace ProcessPBSpews {
 
 		if (uc == 0xFF)
 		{
-			if (fseek(fSrc, 2, SEEK_SET))
-			{
-				return false;
-			}
+			if (!SetFilePtrPos(fSrc, 2)) return false;
 
-			int result = fread(c, 1, 1, fSrc);
-
-			if (result != 1)
-			{
-				return false;
-			}
+			if (!ReadStreamData(fSrc, c, sizeof(char))) return false;
 
 			if (c[0] == 0)
 			{
@@ -269,14 +258,14 @@ namespace ProcessPBSpews {
 				tftFileType = UTF16LittleEndian;
 			}
 
-			fseek(fSrc, lCurrentStreamPos, SEEK_SET);
+			fSrc.seekg(lCurrentStreamPos, std::ios::beg);
 
 			return true;
 		}
 
 		tftFileType = ANSI;
 
-		fseek(fSrc, lCurrentStreamPos, SEEK_SET);
+		SetFilePtrPos(fSrc, lCurrentStreamPos);
 
 		return true;
 
@@ -291,7 +280,7 @@ namespace ProcessPBSpews {
 	}
 
 	bool ReadUnicodeLine::operator()
-		(FILE * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile)
+		(std::ifstream * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile)
 	{
 		if (!f || !pcLineBuffer) return false;
 
@@ -317,7 +306,7 @@ namespace ProcessPBSpews {
 		{
 			try
 			{
-				result = fread(pWideBuf, 1, lSize, f);
+				f->read(reinterpret_cast<char *>(pWideBuf), lSize);
 			}
 			catch (...)
 			{
@@ -326,11 +315,15 @@ namespace ProcessPBSpews {
 
 			uiNumRead += lSize;
 
-			if (result != lSize)
+			if (f->eof())
 			{
 				bEndOfFile = true;
 
 				break;
+			}
+			else if (f->bad())
+			{
+				return false;
 			}
 
 			if ((*pWideBuf == L'\n') || (*pWideBuf == L'\r'))
@@ -360,7 +353,7 @@ namespace ProcessPBSpews {
 	}
 
 	bool ReadASCIILine::operator()
-		(FILE * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile)
+		(std::ifstream * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile)
 	{
 		if (!f || !pcLineBuffer) return false;
 
@@ -380,11 +373,11 @@ namespace ProcessPBSpews {
 
 		while (bLineFeedNotRead)
 		{
-			result = fread(pNarrowBuf, 1, lSize, f);
+			f->read(pNarrowBuf, lSize);
 
 			uiNumRead += lSize;
 
-			if (result != lSize)
+			if (f->bad())
 			{
 				bEndOfFile = true;
 
@@ -418,7 +411,7 @@ namespace ProcessPBSpews {
 
 
 	bool ReadUnicodeBigEndianLine::operator()
-		(FILE * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile)
+		(std::ifstream * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile)
 	{
 		if (!f || !pcLineBuffer) return false;
 
@@ -436,8 +429,6 @@ namespace ProcessPBSpews {
 
 		long lSize = 2;
 
-		size_t result;
-
 		bool bLineFeedNotRead = true;
 
 		setlocale(LC_ALL, "en-US");
@@ -446,11 +437,15 @@ namespace ProcessPBSpews {
 
 		while (bLineFeedNotRead)
 		{
-			wchar_t wct = 0;
+			wchar_t wct;
 
-			result = fread(&wct, 1, lSize, f);
+			f->read(reinterpret_cast<char *>(&wct), lSize);
 
-			if (result != lSize)
+			if (f->bad())
+			{
+				return false;
+			}
+			else if (f->eof())
 			{
 				bEndOfFile = true;
 
@@ -551,49 +546,45 @@ namespace ProcessPBSpews {
 		//
 		// Open the input file read it and fix lines terminate at '\r' only saving the output in a temporary file
 		//
-		FILE * fSrc;
-		
-		errno_t err = fopen_s(&fSrc, sInputFile.c_str(), "r");
+		std::ifstream fSrc(const_cast<char *>(sInputFile.c_str()), std::fstream::binary);
 
-		if (err)
+		if (!fSrc.is_open())
 		{
-			osErrorMsgRet << "Error Opening Source File " << err << std::endl;
+			osErrorMsgRet << "Error Opening Source File " << std::endl;
 
 			sErrorMsgRet = osErrorMsgRet.str();
 
 			return false;
 		}
 
-		FILE * fDest;
-		
-		err = fopen_s(&fDest, sOutputFileUnfiltered.c_str(), "w+");
+		std::ofstream fDest(const_cast<char *>(sOutputFileUnfiltered.c_str()), std::fstream::binary | std::fstream::trunc);
 
-		if (err)
+		if (!fDest.is_open())
 		{
-			fclose(fSrc);
+			fSrc.close();
 
-			osErrorMsgRet << "Error opening unfiltered output file for write " << err << std::endl;
+			osErrorMsgRet << "Error opening unfiltered output file for write " << std::endl;
 
 			sErrorMsgRet = osErrorMsgRet.str();
 
 			return false;
 		}
 
-		bool bUnfilteredFileLinesCollected = CollectUnfilteredFileLines(fSrc, ReadSourceLine, sErrorMsgRet);
+		bool bUnfilteredFileLinesCollected = CollectUnfilteredFileLines(&fSrc, ReadSourceLine, sErrorMsgRet);
 
 		if (bUnfilteredFileLinesCollected) {
 
 			//for (std::vector<std::string>::iterator iter = FileLines.begin(); iter != FileLines.end(); iter++)
 			for (std::string& iterS : UnfilteredFileLines) {
-				fwrite(iterS.c_str(), sizeof(char), strlen(iterS.c_str()), fDest);
+				fDest.write(iterS.c_str(), strlen(iterS.c_str()));
 
-				fflush(fDest);
+				fDest.flush();
 			}
 		}
 		
-		fclose(fSrc);
+		fSrc.close();
 
-		fclose(fDest);
+		fDest.close();
 
 		if (!bUnfilteredFileLinesCollected) return false;
 		
@@ -610,9 +601,9 @@ namespace ProcessPBSpews {
 
 	        InputList.sFileNameToWrite = sOutputFileUnfiltered;
 
-			err = fopen_s(&fDest, sOutputFileUnfiltered.c_str(), "w+");
+			std::ofstream fDest(const_cast<char *>(sOutputFileUnfiltered.c_str()), std::fstream::binary | std::fstream::trunc);
 
-			if (err)
+			if (!fDest.is_open())
 			{
 				osErrorMsgRet << "Error opening destination file" << std::endl; //GetLastError() << endl;
 
@@ -625,12 +616,12 @@ namespace ProcessPBSpews {
 
 			for (std::string & iterS : InputList.FilteredFileLines) {
 				
-				fwrite(iterS.c_str(), sizeof(char), strlen(iterS.c_str()), fDest);
+				fDest.write(iterS.c_str(), strlen(iterS.c_str()));
 
-				fflush(fDest);
+				fDest.flush();
 			}
 
-			fclose(fDest);
+			fDest.close();
 
 		}
 
@@ -657,7 +648,7 @@ namespace ProcessPBSpews {
 	}
 
 	bool GenerateFilteredSpewData::CollectUnfilteredFileLines
-	                    (FILE * fSrc, ReadLineInterface &  ReadSourceLine, std::string & sErrorMsgRet) {
+	                    (std::ifstream * fSrc, ReadLineInterface &  ReadSourceLine, std::string & sErrorMsgRet) {
 		char cLineBuffer[100000];
 
 		std::ostringstream osErrorMsgRet;

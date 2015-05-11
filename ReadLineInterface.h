@@ -7,6 +7,8 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include <iostream>
+#include <fstream>
 
 namespace ProcessPBSpews {
 	const unsigned int uiMaxFileNameSize = 150;
@@ -58,7 +60,22 @@ namespace ProcessPBSpews {
 		std::unique_ptr<ReadLineInterface> getReadLineInterface(std::string sFile, std::string & sErrorMsg);
 
 	private:
-		bool FetchTextFileType(FILE * fSrc, TextFileType & tftFileType, std::string & sErrorMsgRet);
+		bool FetchTextFileType(std::ifstream & fSrc, TextFileType & tftFileType, std::string & sErrorMsgRet);
+
+		bool SetFilePtrPos(std::ifstream & f, long ulPos) {
+			f.seekg(ulPos,std::ios::beg);
+			return !f.bad();
+		}
+
+		bool GetFilePtrPos(std::ifstream & f, long & ulPos) {
+			ulPos = f.tellg();
+			return !f.bad();
+		}
+
+		bool ReadStreamData(std::ifstream & f, char * pByteBuffer, int iNumberOfBytes) {
+			f.read(pByteBuffer,iNumberOfBytes);
+			return !f.bad();
+		}
 	};
 
 	class ReadLineInterface
@@ -67,7 +84,7 @@ namespace ProcessPBSpews {
 		ReadLineInterface();
 		~ReadLineInterface();
 		virtual bool operator()
-			(FILE * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile) = 0;
+			(std::ifstream * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile) = 0;
 
 
 	protected:
@@ -78,21 +95,21 @@ namespace ProcessPBSpews {
 	{
 	public:
 		virtual bool operator()
-			(FILE * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile);
+			(std::ifstream * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile);
 	};
 
 	class ReadUnicodeBigEndianLine final : public ReadLineInterface
 	{
 	public:
 		virtual bool operator()
-			(FILE * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile);
+			(std::ifstream * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile);
 	};
 
 	class ReadASCIILine : public ReadLineInterface
 	{
 	public:
 		virtual bool operator()
-			(FILE * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile);
+			(std::ifstream * f, char * pcLineBuffer, unsigned int uiBufferSizeMax, unsigned int & uiNumberOfCharsRead, bool & bEndOfFile);
 	};
 
 	class GenerateFilteredSpewData
@@ -110,7 +127,7 @@ namespace ProcessPBSpews {
 			 std::vector<sFilterDescriptor> & lFileDescriptors,
 			 std::string &                    sErrorMsgRet);
 
-		bool CollectUnfilteredFileLines(FILE * fSrc, ReadLineInterface&  ReadSourceLine, std::string & sErrorMsgRet);
+		bool CollectUnfilteredFileLines(std::ifstream * fSrc, ReadLineInterface&  ReadSourceLine, std::string & sErrorMsgRet);
 
 		void CollectFilteredFileLines(std::vector<std::string>& UnfilteredFileLines, sFilterDescriptor& InputList);
 
