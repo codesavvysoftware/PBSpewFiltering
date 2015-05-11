@@ -17,12 +17,10 @@
 
 #include <boost/test/included/unit_test.hpp>
 #include "SpewFiltering.hpp"
-//#include <direct.h>
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS //#include <boost/filesystem.hpp>
 #include <fstream>
-
 
 static std::string UnicodeSource = "UnicodeTestSource_01.txt";
 static std::string AnsiSource = "AnsiTestSource_01.txt";
@@ -35,6 +33,8 @@ static std::string SandboxFolderPath = "//home//tomh//SpewFilterTesting//Folder_
 static std::string SandboxOutputFolderPath = "//home//tomh//SpewFilterTesting//Output_Files_Go_Here//";
 static std::string RelOutputFolder = "..\\Output_Files_Go_Here\\";
 #else
+#include <direct.h>
+#define chdir _chdir
 static std::string sTestOutputFileName = "A Test for Separate Output Files";
 static std::string RelFolder = "..\\Folder SandBox\\";
 static std::string SourceFolderPath = "C:\\Spew Filter Test\\Test File Source\\";
