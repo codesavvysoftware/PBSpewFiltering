@@ -377,13 +377,26 @@ namespace ProcessPBSpews {
 
 			uiNumRead += lSize;
 
+			bool bReadError = false;
+
+			bool bFileEnd = false;
+
 			if (f->bad())
+			{
+				bReadError = true;
+			}
+			else if (f->eof())
+			{
+				bFileEnd = true;
+			}
+
+
+			if (bReadError || bFileEnd)
 			{
 				bEndOfFile = true;
 
 				break;
 			}
-
 
 			if ((*pNarrowBuf == '\n') || (*pNarrowBuf == '\r'))
 			{
@@ -546,7 +559,7 @@ namespace ProcessPBSpews {
 		//
 		// Open the input file read it and fix lines terminate at '\r' only saving the output in a temporary file
 		//
-		std::ifstream fSrc(const_cast<char *>(sInputFile.c_str()), std::fstream::binary);
+		std::ifstream fSrc(const_cast<char *>(sInputFile.c_str()), std::ios::binary);
 
 		if (!fSrc.is_open())
 		{
@@ -557,7 +570,7 @@ namespace ProcessPBSpews {
 			return false;
 		}
 
-		std::ofstream fDest(const_cast<char *>(sOutputFileUnfiltered.c_str()), std::fstream::binary | std::fstream::trunc);
+		std::ofstream fDest(const_cast<char *>(sOutputFileUnfiltered.c_str()), std::ios::trunc);
 
 		if (!fDest.is_open())
 		{
@@ -576,7 +589,11 @@ namespace ProcessPBSpews {
 
 			//for (std::vector<std::string>::iterator iter = FileLines.begin(); iter != FileLines.end(); iter++)
 			for (std::string& iterS : UnfilteredFileLines) {
-				fDest.write(iterS.c_str(), strlen(iterS.c_str()));
+				const char * pWriteData = iterS.c_str();
+
+				int    nWrite = strlen(pWriteData);
+
+				fDest.write(pWriteData, nWrite);
 
 				fDest.flush();
 			}
@@ -601,7 +618,7 @@ namespace ProcessPBSpews {
 
 	        InputList.sFileNameToWrite = sOutputFileUnfiltered;
 
-			std::ofstream fDest(const_cast<char *>(sOutputFileUnfiltered.c_str()), std::fstream::binary | std::fstream::trunc);
+			std::ofstream fDest(const_cast<char *>(sOutputFileUnfiltered.c_str()), std::ios::trunc);
 
 			if (!fDest.is_open())
 			{
@@ -616,7 +633,11 @@ namespace ProcessPBSpews {
 
 			for (std::string & iterS : InputList.FilteredFileLines) {
 				
-				fDest.write(iterS.c_str(), strlen(iterS.c_str()));
+				const char * pWriteData = iterS.c_str();
+
+				int    nWrite = strlen(pWriteData);
+
+				fDest.write(pWriteData, nWrite);
 
 				fDest.flush();
 			}
