@@ -658,7 +658,7 @@ namespace ProcessPBSpews {
 
 			for (std::string& sFilter : vStart)// = StartIterating; iterFilters != EndIterating; iterFilters++ )
 			{
-				auto found = iterS.find(sFilter.c_str());// iterFilters->c_str());//   itInputList->sToFilterOn[i]);
+				int found = iterS.find(sFilter.c_str());// iterFilters->c_str());//   itInputList->sToFilterOn[i]);
 
 				if (found != std::string::npos)
 				{
@@ -751,17 +751,19 @@ namespace ProcessPBSpews {
 	}
 	void GenerateFilteredSpewData::AppendFileNameSuffix( std::string & sFileName, const std::string & sSuffix )
 	{
-		auto iFileExtPos = sFileName.find('.');
+		int iFileExtPos = sFileName.find('.');
 
 		if (iFileExtPos < 0) {
 			sFileName += sSuffix;
 		}
 		else {
-			auto iNumberToErase = sFileName.length();
+			int iNumberToErase = sFileName.length();
 
 			iNumberToErase -= iFileExtPos;
 
 			sFileName.erase(iFileExtPos, iNumberToErase);
+
+			unsigned int uiCapacity = sFileName.capacity();
 
 			sFileName += sSuffix;
 		}

@@ -23,7 +23,7 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 
 	const char * pcOutputFileKey    = ",o";
 
-	const char * pcTypeOfFilterKey  = "TypeOfFilter,t";
+	const char * pcTypeOfFilterKey  = ",t";
 
 	const char * pcHelpKey          = "help,h";
 
@@ -34,13 +34,13 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 	const char * pcHelpOption       = "help";
 
 	const char * pcFilterOptions =
-			  "a - Produce all of the filter files\n"
-			  "                                e - Produce a file with all the filters included\n"
-			  "                                h - HFP debug lines only\n"
-			  "                                s - Action Script messages only\n"
-			  "                                p - Bluetooth phone messages only\n";
-  			  "                                m - MAP related phone messages only\n";
-			  "                                u - USB connected messages only";
+		"a - Produce all of the filter files\n"
+		"                                e - Produce a file with all the filters included\n"
+		"                                h - HFP debug lines only\n"
+		"                                s - Action Script messages only\n"
+		"                                p - Bluetooth phone messages only\n"
+		"                                m - MAP related phone messages only\n"
+		"                                u - USB connected messages only";
 
 	const char * pcERROR_OptionOutOfOrder  = "ERROR: File to Filter needs to be the first option entered";
 	const char * pcERROR_InvalidFilterType = "ERROR: Invalid Filter type entered";
@@ -48,7 +48,7 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 
 	const char * pcInputFileOptionID    = "-i";
 	const char * pcOutputFileOptionID   = "-o";
-	const char * pcTypeOfFilterOptionID = "--TypeOfFilter,-t";
+	const char * pcTypeOfFilterOptionID = "-t";
 
 	const char * pcInfileEnteredPrompt  = "Input File Entered: ";
 	const char * pcOutfileEnteredPrompt = "Output File Entered: ";
@@ -115,6 +115,8 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 
 		    sfp.sfFilterToApply = PRODUCE_EVERY_FILE;
 
+			int kk = vm.count(pcTypeOfFilterOptionID);
+
 		    if (vm.count(pcTypeOfFilterOptionID)) {
 		    	std::string s = vm[pcTypeOfFilterOptionID].as<std::string>();
 
@@ -146,7 +148,7 @@ int SpewFiltering::ConfigureFilteringParams( int & argc, char ** & argv, SpewFil
 
 		    		break;
 
-		    	case 'P':
+		    	case 'p':
 		    		sfp.sfFilterToApply = ONLY_PHONE_FILTER;
 
 		    		break;
@@ -335,13 +337,13 @@ bool SpewFiltering::ProduceFilteredSpewFiles( SpewFilteringParams & sfp ) {
 }
 
 std::string SpewFiltering::TrimWhiteSpace(const std::string & str, const std::string & whitespace) {
-	const auto strBegin = str.find_first_not_of(whitespace);
+	const int strBegin = str.find_first_not_of(whitespace);
 
 	if (strBegin == std::string::npos) return "";
 
-	const auto strEnd = str.find_last_not_of(whitespace);
+	const int strEnd = str.find_last_not_of(whitespace);
 
-	const auto strRange = strEnd - strBegin + 1;
+	const int strRange = strEnd - strBegin + 1;
 
 	return str.substr(strBegin, strRange);
 }
